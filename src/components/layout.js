@@ -12,12 +12,23 @@ const Layout = ({ children }) => (
         site {
           siteMetadata {
             title
+            title2
+          }
+        }
+        allFile {
+          edges {
+            node {
+              relativePath
+              prettySize
+              extension
+              birthTime(fromNow: true)
+            }
           }
         }
       }
     `}
     render={data => (
-      <>
+        <>
         <Header siteTitle={data.site.siteMetadata.title} />
         <div
           style={{
@@ -51,6 +62,7 @@ const Layout = ({ children }) => (
                   </form>
               </div>
               © {new Date().getFullYear()} Matthias Nehlsen
+              {console.log(data)}
           </footer>
         </div>
       </>

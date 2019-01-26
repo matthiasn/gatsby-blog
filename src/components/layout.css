@@ -60,7 +60,6 @@ dfn {
 }
 h1 {
   font-size: 2em;
-  margin: 0.67em 0;
 }
 mark {
   background-color: #ff0;
@@ -226,7 +225,6 @@ h1 {
   padding-left: 0;
   padding-right: 0;
   padding-top: 0;
-  margin-bottom: 1.45rem;
   color: inherit;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -617,4 +615,14 @@ pre tt:after {
   html {
     font-size: 100%;
   }
+}
+time {
+  padding-bottom: 12px;
+  display: block;
+  font-family: 'Oswald';
+  font-weight: 300;
+}
+
+h1 {
+  margin-bottom: 6px;
 }
