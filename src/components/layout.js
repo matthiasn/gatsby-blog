@@ -12,6 +12,7 @@ const Layout = ({ children }) => (
         site {
           siteMetadata {
             title
+            subTitle
           }
         }
         allFile {
@@ -28,7 +29,8 @@ const Layout = ({ children }) => (
     `}
     render={data => (
         <>
-        <Header siteTitle={data.site.siteMetadata.title} />
+        <Header siteTitle={data.site.siteMetadata.title}
+                subTitle={data.site.siteMetadata.subTitle}/>
         <div
           style={{
             margin: `0 auto`,

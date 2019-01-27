@@ -14,9 +14,6 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
         const slug = createFilePath({ node, getNode, basePath: `pages` })
         const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,"$1/$2/$3/");
 
-        console.log(slug)
-        console.log(slug2)
-
         createNodeField({
             node,
             name: `slug`,
@@ -41,7 +38,12 @@ exports.createPages = ({ graphql, actions }) => {
     }
   `
     ).then(result => {
-        result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+        const posts = result.data.allMarkdownRemark.edges;
+
+        posts.forEach(({ node }, index) => {
+            const prev = index === 0 ? false : posts[index - 1].node.fields.slug;
+            const next = index === posts.length - 1 ? false : posts[index + 1].node.fields.slug;
+
             createPage({
                 path: node.fields.slug,
                 component: path.resolve(`./src/templates/blog-post.js`),
@@ -49,8 +51,10 @@ exports.createPages = ({ graphql, actions }) => {
                     // Data passed to context is available
                     // in page queries as GraphQL variables.
                     slug: node.fields.slug,
+                    next,
+                    prev
                 },
             })
         })
     })
-}
+};
