@@ -7,8 +7,6 @@ categories:
 ---
 Last week, I published the very first version of my **["Building a System in Clojure"](https://leanpub.com/building-a-system-in-clojure)** book. I’m thrilled by the amount of interest it has already generated and I’ll do my best to live up to your expectations.
 
-<!-- more -->
-
 Today, after a few hundred readers signed up for free, I have removed the free option. There are more than enough readers now to give valuable feedback on the early versions of the book.
 Yesterday and today I have published new versions, with the latest one being roughly 25 pages longer than the initial version. The content is growing fast and a good part of the reason why is that I **really like the authoring process**[^1].
 

@@ -12,11 +12,15 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
     const { createNodeField } = actions
     if (node.internal.type === `MarkdownRemark`) {
         const slug = createFilePath({ node, getNode, basePath: `pages` })
+        const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,"$1/$2/$3/");
+
         console.log(slug)
+        console.log(slug2)
+
         createNodeField({
             node,
             name: `slug`,
-            value: slug,
+            value: slug2,
         })
     }
 }
@@ -37,8 +41,6 @@ exports.createPages = ({ graphql, actions }) => {
     }
   `
     ).then(result => {
-        console.log(JSON.stringify(result, null, 4))
-
         result.data.allMarkdownRemark.edges.forEach(({ node }) => {
             createPage({
                 path: node.fields.slug,

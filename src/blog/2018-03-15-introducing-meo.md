@@ -8,18 +8,15 @@ categories:
 
 I would like to dedicate this blog post to my **grandma**. She just turned 94. Happy birthday, Grandma, I love you. This is a perfect time for introducing **[meo](https://github.com/matthiasn/meo)**, a [Clojure](https://clojure.org/)/[ClojureScript](https://clojurescript.org/) project that she inspired. About two years ago, she showed me a few photos from a trip to **Iceland**, including this one:
 
-{% img left /images/2018-03-08-oma-iceland.jpg %}
-
+![Oma Iceland](../images/2018-03-08-oma-iceland.jpg)
 
  I asked her what year that was. She did not remember but retrieved a folder, scanned a few pages, and less than a minute later reported the details of the trip - it was in May 1987. I was stunned, as it dawned on me that I did not have anything like that for the past 20 years of my life, in which I visited 39 countries. Emails with itineraries, photos with geolocation for a few years back, sure, but all very fragmented, and far from me being able to give a concise summary of any of those trips in 60 seconds or less. I told her I wish I had recordings like that, and she said, 'Really? I wish I had recorded more.'
-
-<!-- more -->
 
 That made me think hard about the problem of getting older and forgetting more and more. I had always wanted a journal, but using paper wasn't an option. I cannot even read my own handwriting, or at least find it very unpleasant. Also, paper-based notes have physical weight, plus indexing them sucks. I wanted a digital journal instead, one that runs on both desktop and mobile, and that does not require me to hand my recordings over to interested third parties. 
 
 Nope, journals must be (and stay) private. Also, it would have to be an open-source tool so that anyone can check what it does with your data. I have zero reason to take anyone by their word on how they will respect my privacy. Maybe they mean it as of today, but through either neglect or change of mind, they will probably still sell or lose my data at some point, especially if it's a free service that struggles to find a business model while dealing with increasing infrastructure costs. What if there was an application that does not share your information with anyone? **[meo](https://github.com/matthiasn/meo)** wants to be this project, but first, I would like people smarter than me to review it, and point out where it can be improved and made more secure before making it generally available as a packaged thing [^1]. You can use it now if you don't mind building it yourself, though. Here's how the desktop application currently looks like:
 
-{% img left /images/2018-03-08-meo-desktop.png %}
+![Meo Desktop](../images/2018-03-08-meo-desktop.png)
 
 Meo is an intelligent, data-driven journal. Initially, I just used it for recording text and photos together with my exact whereabouts at the time. But I pretty soon realized that I would not necessarily spend much time on keeping a journal just so that I could benefit in some rather distant future. I knew I would enjoy having more information about my current life in that distant future, but the process of collecting data would also have to be helpful in the now. [^2] I always found it to be a waste of data to throw away notes on tasks and their completion, and I also read '[The Effective Executive](https://www.harpercollins.com/9780060833459/the-effective-executive)' by Peter Drucker at the time. The chapter 'Know Thy Time' where he suggests recording how you spend your time inspired me in particular. I wanted that, only built into my journal and recording how I spend my time all through the year(s), instead of recording stuff on paper for weeks at a time. 
 
@@ -33,7 +30,7 @@ Then I thought I would like to record additional information about myself, for e
 
 Here's how that looks like, with the labels omitted again, because hey, most of that is none of your business:
 
-{% img left /images/2018-03-08-meo-charts.png %}
+![Meo Charts](../images/2018-03-08-meo-charts.png)
 
 In other contexts, companies pay money for banner ads, so I assume they are proven to work. Only that here, the banner ad, being about myself, is far more relevant to my life than any commercial advertisement could ever be. I want to spend more time in the future on relevant calls to action in both those banner ads on the desktop and notifications on mobile. It already helps me to see that I have multiple days in a row where I have walked over 10K steps, and that then motivates me to keep going, but there is a lot more potential. For example, the application could tell me to go for a walk after the completion of a task when I'm nowhere near being on track for meeting my daily goal.
 
@@ -43,7 +40,7 @@ I researched a few psychological instruments for assessing current mood. I'm by 
 
 Here's how filling out the **PANAS** looks like: 
 
-{% img left /images/2018-03-08-meo-panas.png %}
+![Meo PANAS](../images/2018-03-08-meo-panas.png)
 
 I found that most questionnaires work in a similar way, with a [Likert scale](https://en.wikipedia.org/wiki/Likert_scale), some of the items reversed, and any number of scores derived from filling out the questionnaire. Those can now be defined in **[meo](https://github.com/matthiasn/meo)** via configuration as an edn-file, but ideally, there should be a graphical user interface for defining and editing surveys. Pull requests most undoubtedly welcome.
 
@@ -57,7 +54,7 @@ Next, there is a mobile application. Initially, I started with an [iOS app writt
 
 So I built a mobile app in ClojureScript on top of [React Native](http://facebook.github.io/react-native/). At this point, one can record text entries, import data from Apple Health, and photos, all of which are then synced one direction to the desktop application, using a user-provided WebDAV folder, and then passes journal entries inside AES-256 encrypted files. Entries on mobile can also be edited, and updates are then synced. Conflicts are detected using a vector clock, which is mostly thanks to [Tyler Neely](https://github.com/spacejam), who provided the theory and guided the implementation. Right now, conflicts are only shown, and there still needs to be a UI for resolving them. Syncing should also work both ways. And the structure of my code is still quite convoluted. I wish my days were longer, then I would probably spend a lot more time in this area. Overall, the code quality here really needs to be improved. Anyway, this is how the app currently looks like, with both a light and a dark theme:
 
-{% img left /images/2018-03-08-mobile.png %}
+![Meo Mobile](../images/2018-03-08-mobile.png)
 
 If you think all this makes sense and you believe in the idea that we should be able to record stuff about our lives without other parties eavesdropping in on that, and that a tool for doing so should be open source, then please subscribe to the mailing list at the bottom of the page so I can keep you updated on the development progress, and when both desktop and mobile applications will be released. Of course it would help the most if you became an active contributor, but you can also help finding collaborators by sharing this article. Thank you. Now for the more technical side of things.
 
@@ -68,15 +65,15 @@ If the above applies, and you also want to learn [Clojure](https://clojure.org/)
 
 I have built a tool that hopefully helps in onboarding anyone who is interested in collaborating, and it is called [inspect](https://github.com/matthiasn/inspect). It's a tool for looking inside a running application built on top of the [systems-toolbox](https://github.com/matthiasn/systems-toolbox). This is a library I built quite some time ago, with the vision of building something like inspect, but lacking the skills to do so back at the time. Working on **[meo](https://github.com/matthiasn/meo)** and the electron application around it eventually enabled me to build a first standalone desktop version of inspect. Systems on top of the systems-toolbox have a so called firehose where, when enabled, all message flows are copied to, and persisted, for example on a Kafka topic. Inspect then consumes this Kafka topic and groups message flows together for visualization, and also infers the structure of the system from successful message flows it observed. Here's the overall structure of [meo](https://github.com/matthiasn/meo), as seen by [inspect](https://github.com/matthiasn/inspect):
 
-{% img left /images/2018-03-08-inspect-overview.png %}
+![Inspect Overview](../images/2018-03-08-inspect-overview.png)
 
 Here with the communication for a selected message type:
 
-{% img left /images/2018-03-08-inspect-selection.png %}
+![Inspect Selection](../images/2018-03-08-inspect-selection.png)
 
 Here's a particular flow for taking a screenshot, which involves the main electron process, the renderer process, and the JVM "backend" application they talk to. 
 
-{% img left /images/2018-03-08-inspect-flow.png %}
+![Inspect Flow](../images/2018-03-08-inspect-flow.png)
 
 It looks convoluted because it is, and I have not had the time to simplify it yet. But at least there's a tool for visualizing the madness, which is something I wish more projects had. I will talk more about this tool in subsequent blog posts. While many areas in the **[meo](https://github.com/matthiasn/meo)** codebase still suck, at least there is visibility like this, and that's kinda fun. But there is also plenty room for improvement in inspect, so if that interests you, please help in making this more useful and/or prettier. For example, it would be cool if my coworkers wouldn't always make fun of me that my laptop was about to take off when I use inspect. The system that upon inspection makes my laptop fans max out processes a lot more data and runs on more than ten nodes, but I think that nonetheless there are better solutions that would not max out the render process in Electron. This is yet another area where fresh sets of eyes would be helpful.
 
@@ -86,26 +83,6 @@ Thanks for reading. Let me know if you have any questions [^6] or comments. You 
 
 Until next time,
 Matthias
-
-<!-- Begin MailChimp Signup Form -->
-<link href="//cdn-images.mailchimp.com/embedcode/slim-10_7.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif;  width:400px;}
-	/* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
-	   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
-</style>
-<div id="mc_embed_signup" style="margin-bottom: 30px;">
-<form action="https://matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	
-	<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_798fd7b50a1d9cc58be41c2af_eb7a7193c5" tabindex="-1" value=""></div>
-    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-<!--End mc_embed_signup-->
 
 [^1]: Code review is one of the many areas where I am looking for collaborators. I'm particularly curious about my choice for encryption, and if I made sane choices, and improve them where I did not.
 

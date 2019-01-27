@@ -7,8 +7,6 @@ categories:
 ---
 This is a rant. 
 
-<!-- more -->
-
 I've been having issues with my Retina MacBook lately, to the point where I am craving a Linux-based laptop. But there are two programs that keep me on the Mac at the moment:
 
 * Photoshop

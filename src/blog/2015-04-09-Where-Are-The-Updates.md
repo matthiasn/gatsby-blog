@@ -7,9 +7,6 @@ categories:
 ---
 **TL;DR:** I've been developing a library for building systems, and it has already made the codebase of the BirdWatch application much simpler. I'll be back to updating the book using the new code and concepts soon. Thanks for buying the book!
 
-<!-- more -->
-
----
 
 <br>
 

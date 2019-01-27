@@ -12,7 +12,6 @@ const Layout = ({ children }) => (
         site {
           siteMetadata {
             title
-            title2
           }
         }
         allFile {
@@ -62,7 +61,6 @@ const Layout = ({ children }) => (
                   </form>
               </div>
               © {new Date().getFullYear()} Matthias Nehlsen
-              {console.log(data)}
           </footer>
         </div>
       </>
