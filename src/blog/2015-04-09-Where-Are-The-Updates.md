@@ -7,9 +7,6 @@ categories:
 ---
 **TL;DR:** I've been developing a library for building systems, and it has already made the codebase of the BirdWatch application much simpler. I'll be back to updating the book using the new code and concepts soon. Thanks for buying the book!
 
-
-<br>
-
 Hi there, and thank you for becoming a reader of **[Building a System in Clojure (and ClojureScript)](https://leanpub.com/building-a-system-in-clojure)** early on[^1]. You will probably have wondered by now when I was planning to release new content. That's a valid question -- and you deserve to know.
 
 Writing a book while people are reading it is an interesting endeavor as that substantially raises the hurdle for changing something. I never thought about that before, yet it is very real. Without readers, you can just shuffle stuff around, throw away or completely rewrite parts without having to answer to anyone. With readers, the author should at least have a good reason to make radical changes. I'm not saying that's a bad thing, it's just different.

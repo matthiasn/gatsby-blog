@@ -7,8 +7,6 @@ categories:
 ---
 I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy. 
 
-<!-- more -->
-
 **UPDATE 06/27/2013:** Here is how it looks like. **[The source is on GitHub](https://github.com/matthiasn/sse-chat/)**.
 
 <iframe width="420" height="425" src="http://sse-chat.matthiasnehlsen.com/" frameborder="0" allowfullscreen></iframe>
@@ -18,6 +16,8 @@ There should be actors randomly reciting Romeo and Juliet in Room 1 above if eve
 I challenged myself to write a chat server for this purpose, with 10 lines of code on the server side (or less). I knew this would be possible thanks to the awesome **[Play Iteratee library](http://www.playframework.com/documentation/2.1.1/Iteratees)**:
 
 {% codeblock Chat Controller lang:scala https://github.com/matthiasn/sse-chat-example/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/controllers/ChatApplication.scala ChatApplication.scala %}
+
+````scala
 object ChatApplication extends Controller {
   /** Central hub for distributing chat messages */
   val (chatOut, chatChannel) = Concurrent.broadcast[JsValue]
@@ -38,11 +38,11 @@ object ChatApplication extends Controller {
     Ok.stream(chatOut &> filter(room) &> EventSource()).as("text/event-stream") 
   } 
 }
-{% endcodeblock %}
+````
 
 What happens here is fairly straightforward once we look at the drawing:
 
-{% img left /images/sse-chat.png 'image' 'images' %}
+![sse-chat](../images/sse-chat.png)
 
 The **[Concurrent object](https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)** is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel **[Broadcaster](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster)**. The individual streaming connections then attach an Iteratee to the provided chatOut **[Enumerator](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator)**, with **[Enumeratees](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)**  in between.
 
@@ -54,7 +54,7 @@ In the **chatFeed** function we have a chain of Enumerator and two Enumeratees: 
 
 Let's visualize this:
 
-{% img left /images/sse-chat2.png 'image' 'images' %}
+![sse-chat2](../images/sse-chat2.png)
 
 A message is pushed into the chatChannel and distributed to all attached Iteratees (wrapped by the filter Enumeratee and the EventSource). The message is then sent to the client as a Server Sent Event, but only if the filter predicate evaluates to true.
 
@@ -64,6 +64,8 @@ I wrote an **[initial version](https://github.com/matthiasn/sse-chat/blob/0af191
 Last week I started learning AngularJS, so I thought I'd give it a try. Not only is the resulting code more than 30% smaller, it also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes. 
 
 {% codeblock AngularJS Chat View lang:html https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/views/index.scala.html index.scala.html %}
+
+````html
 <div ng-controller="ChatCtrl">
     <div id="header">
         Your Name: <input type="text" name="user" id="userField" value="John Doe" 
@@ -90,11 +92,13 @@ Last week I started learning AngularJS, so I thought I'd give it a try. Not only
         </form>
     </div>
 </div>        
-{% endcodeblock %}
+````
 
 The latest 10 items within **$scope.msgs** are rendered into the "chat" div above. The color of each div is also defined in the view by testing if the current user is the sender of the message or by adding CSS class 'others' if not. No more direct DOM manipulation. Very nice.
 
 {% codeblock AngularJS Chat Controller lang:javascript https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/assets/javascripts/controllers.js controllers.js %}
+
+````js
 /** Controllers */
 angular.module('sseChat.controllers', ['sseChat.services']).
     controller('ChatCtrl', function ($scope, $http, chatModel) {
@@ -131,7 +135,7 @@ angular.module('sseChat.controllers', ['sseChat.services']).
 
         $scope.listen();
     });
-{% endcodeblock %}
+````
 
 The **$scope** is managed by **[AngularJS](http://angularjs.org)** and we define its properties inside the controller, for example **$scope.msgs**, as an empty array. Whenever new messages come in, they are appended to the array, automagically updating the view. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an **apply()** call in order to update the UI. That was one of the valuable lessons I learned.
 

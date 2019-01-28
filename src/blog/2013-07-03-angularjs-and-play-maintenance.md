@@ -7,8 +7,6 @@ categories:
 ---
 This is the follow-up on last week's article about **[AngularJS and Play Framework](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. I want to share with you the problems that I encountered on the server side while running the demo as well as my ideas of how to deal with comparable problems more efficiently in the future. I have not encountered any AngularJS-related problems with the chat application so we won't deal with it today. I'll have more on **[AngularJS](http://angularjs.org)** next week.
 
-<!-- more -->
-
 ###So, what was the problem?
 The article was online and the demo was running. Load on the server was not very high, I saw up to 60 users connected at the same time, so really not a load substantial enough that could cause problems. Yet sometimes when I connected, the chat room would load, but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors had crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything did work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)**, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between dropped connection and reconnect will be lost, but that‘s not a problem for my demo, and nothing that can‘t be solved if need be.
 
@@ -16,7 +14,7 @@ Still, it doesn‘t feel right to keep inserting the logging code, recompiling a
 
 There was really only one explanation that made any sense to me: occasionally one of the connected clients would not properly disconnect, maybe on a mobile connection, and then that connection would time out after a while. So far so good. But why would that hold up other clients? Could it be that **[Concurrent.broadcast](https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)** really came to a complete halt when any one of the attached **[Enumeratee](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)** / **[Iteratee](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee)** chains took longer than usual? Turns out the answer is yes, unless extra steps are taken. Let‘s look at a simple example. I recommend you fire up the Play / Scala REPL using **play console** and copy & paste the code below:
 
-{% codeblock No Buffer lang:scala %}
+````scala
 import play.api.libs.iteratee.{Concurrent, Enumeratee, Iteratee}
 
 val (out, channel) = Concurrent.broadcast[Int]
@@ -28,11 +26,11 @@ val iteratee2 = Iteratee.foreach[Int] { i => println("iteratee2: " + i) }
 out |>> iteratee2
 
 for (x <- 1 to 50) { channel.push(x) }
-{% endcodeblock %}
+````
 
 Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. That's not what I need here. How can we overcome this? By inserting a buffering Enumeratee: 
 
-{% codeblock With Buffer lang:scala %}
+```scala
 import play.api.libs.iteratee.{Concurrent, Enumeratee, Iteratee}
 
 val (out, channel) = Concurrent.broadcast[Int]
@@ -45,20 +43,21 @@ val iteratee2 = Iteratee.foreach[Int] { i => println("iteratee2: " + i) }
 out &> Concurrent.buffer(100) |>> iteratee2
 
 for (x <- 1 to 50) { channel.push(x) }
-{% endcodeblock %}
+````
 
 Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. The buffer also drops messages when it is full. 
 
 Now after adding the buffering Enumeratee to the chat application, everything works just fine, as long as the individual buffers are large enough. 
 
 {% codeblock Chat Controller lang:scala https://github.com/matthiasn/sse-chat/blob/678a02671a63fc50dc0da34ffe452b4f472e972e/app/controllers/ChatApplication.scala ChatApplication.scala %}
+````scala
 /** Controller action serving activity based on room */
 def chatFeed(room: String) = Action { 
   Ok.stream(chatOut &> filter(room) 
     &> Concurrent.buffer(20) 
     &> EventSource()).as("text/event-stream") 
 }
-{% endcodeblock %}
+````
 
 ###How can I handle a problem like this better the next time?
 Unit testing would hardly have helped here, unless we tested for the scenario of an incorrectly closed the WS connection. Better knowledge about the timing of events through better logging would have helped immensely, though. Logging to files is not extremely useful when trying to find anomalies like the aforementioned timeouts and spikes directly thereafter; at least my eyes are not good at detecting this in plain text. 

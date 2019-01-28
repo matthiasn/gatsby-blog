@@ -7,8 +7,6 @@ categories:
 ---
 A couple of weeks back I was trying to wrap my head around **[Iteratees](http://www.playframework.com/documentation/2.0.4/Iteratees)** so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right. 
 
-<!-- more -->
-
 I had to see this in action in order to understand how this Iteratee thing works. So I was looking for a stream of information that I could use. I found it in the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)**. A stream of Tweets can be interesting, even outright entertaining, having chosen the right topic(s), and Tweets being tweeted right now when watching the visualization is something that seems easy to relate to. I also wanted to try out a supervised actor hierarchy in this project, so I decided to download the original profile images from Twitter for every single Tweet, down convert them using a couple of actors doing image manipulation and storing an 80x80px PNG thumbnail in **[MongoDB](http://www.mongodb.org)**. This supervised image manipulation will be the topic of another post though.
 
 On the client side I wanted something flashy that makes it obvious that live information from the real world is flowing through the system and reasoned about. I had recently taken an interest in **[D3.js](http://d3js.org)** and I had seen the **[d3-cloud](https://github.com/jasondavies/d3-cloud)** wordcloud implementation by Jason Davies, which is nice to look at, so I wondered if it was difficult to drive it from data streaming to the client over a **[WebSocket](http://tools.ietf.org/html/rfc6455)** connection. The UI at this point was not supposed to be particularly useful, it was really only designed for the effect, as a visualization of something happening **right now**. I am fully aware that a wordcloud is not the best way for showing the frequency of words, and having it regenerate every 5 seconds makes it even less useful perceptually since whatever you look at will be gone before you can even fully focus on the smaller items. That being said, the focus of this project was learning how Iteratees work. The **[D3.js](http://d3js.org)** I use for this project is very basic on my end, I will focus on doing more useful things with D3 later on.
@@ -17,21 +15,22 @@ So I started working on this reactive web application called **[BirdWatch](https
 
 Let's look at my initial high-level architectural drawing (warning, it is inaccurate, read on to find out why):
 
-{% img left /images/BirdWatch.svg 800 300 'image' 'images' %}
+![BirdWatch](../images/BirdWatch.svg)
 
 At first, this seems to make sense. The WS object (upper left box named Twitter) acts as our Enumerator, taking the chunks of Array[Byte] it is receiving from the open HTTP connection with the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** endpoint and passing them along into an Iteratee:
 
-{% codeblock WS-Client lang:scala https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala TwitterClient.scala %}
+````scala
 val url = "https://stream.twitter.com/1.1/statuses/filter.json?track="
 val conn = WS.url(url + TwitterClient.topics.mkString("%2C").replace(" ", "%20"))
     .withTimeout(-1)
     .sign(OAuthCalculator(consumerKey, accessToken))
     .get(_ => TwitterClient.tweetIteratee)
-{% endcodeblock %}
+````
+[TwitterClient.scala](https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala)
 
 The Iteratee then performs some action (JSON parsing from String, Tweet parsing from JSON, sending the Tweet to the ImageConversion actor) for each chunk, without accumulating intermediate state.
 
-{% codeblock tweetIteratee (shortened) lang:scala https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala TwitterClient.scala %}
+````scala
 /** Iteratee for processing each chunk from Twitter stream of Tweets. Parses Json chunks 
 * as Tweet instances and publishes them to eventStream. */
 val tweetIteratee = Iteratee.foreach[Array[Byte]] { chunk =>
@@ -45,7 +44,9 @@ val tweetIteratee = Iteratee.foreach[Array[Byte]] { chunk =>
     case JsError(msg) => println(chunkString)
   }
 }
-{% endcodeblock %}
+```` 
+
+[TwitterClient.scala](https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala)
 
 This at first seduced me into believing that the Iteratee for sending the tweets was one particular instance that performed these repeated actions as specified in the foreach part. But that is not the case. The Iteratee is immutable and every time we pass information to an Iteratee in a step, a new Iteratee is created in return. This does not seem terribly useful as long as we only want to perform a foreach without accumulated state. But bear with me.
 
@@ -55,7 +56,7 @@ For the wordcount, which feeds both the wordcloud and the bar chart in the UI, w
 
 Let's have a look at the implementation of the tweetListIteratee:
 
-{% codeblock tweetListIteratee (shortened) lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/WordCount.scala WordCount.scala %}
+````scala
 /** Creates Iteratee which holds a List[Tweet] of length up to n as its state in each step,  
  *  based on the provided tweetList. The newest element is found in the head of the list.
  *  Allows passing in a "side-effecting" function f, e.g. for testing or pushing data to 
@@ -75,7 +76,9 @@ def tweetListIteratee(f: List[Tweet] => Unit, tweetList: List[Tweet],
       newTweetList
     }
   }
-{% endcodeblock %}
+````
+
+[WordCount.scala](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/WordCount.scala)
 
 So here we have constructed an Iteratee which takes as parameters a function f that takes a List[Tweet] and returns Unit, a TweetList which will be our accumulator in the fold and n, which is the maximum size of the list in the accumulator or in other words the maximum size of our rolling window that we will reason about. What happens here is that the Iteratee will receive the previous accumulator / state (a List[Tweet]) and a single Tweet, prepend the single Tweet as the new head of the accumulator, limited to a list of maximum size n and then return that new list as the state inside the partial function. 
 
@@ -83,7 +86,7 @@ The tweetListIteratee also runs function f, which is by definition purely side-e
 
 Let's look at that function we substitute for f before we wire the Iteratee into an Enumerator:
 
-{% codeblock interceptTweetList lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala Twitter.scala %}
+````scala
 /** "side-effecting" function to do something with the accumulator without possibly mutating it
  * e.g. push some computation to a WebSocket enumerator or to log file
  * @param    tweetList accumulator inside the Iteratee
@@ -98,11 +101,12 @@ def interceptTweetList(tweetList: List[Tweet]) {
 
   wsOutChannel.push(Json.stringify(Json.toJson(tweetState)))
 }
-{% endcodeblock %}
+````
+[Twitter.scala](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala) 
 
 This function above calculates mean and standard deviation for character count and word count within the tweets inside the rolling window, which by now is the old state from the previous Iteratee plus the latest Tweet pushed into the Iteratee appended at the head of the list (limited to size n if larger): 
 
-{% codeblock stdDev lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/Calc.scala Calc.scala %}
+````scala
 /** Calculate standard deviation from TraversableOnce[Int]
  *  @param    xs collection of Int
  *  @return   (mean: Double, stdDev: Double)
@@ -114,11 +118,13 @@ def stdDev(xs: TraversableOnce[Int]): (Double, Double) = {
   val stdDev = Math.sqrt( xs.foldLeft(0.0) { case (acc, x) => acc + (x-mean) * (x-mean) } / n )
   (mean, stdDev)
 }
-{% endcodeblock %}
+````
+
+[Calc.scala](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/Calc.scala)
 
 and also the word frequency map:
 
-{% codeblock countTweetWords & topN lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/WordCount.scala WordCount.scala %}
+````scala
 /** Counts words in List[Tweet], returning Map[String, Int] with wordMap filtered by 
  *  regular expression and not containing any word from the stopWords set
  *  @param    tweetList List[Tweet] to count words in
@@ -141,13 +147,14 @@ def topN(tweetList: Seq[Tweet], n: Int): ListMap[String, Int] = {
   val wordMap = countTweetWords(tweetList)
   ListMap[String, Int](removeShortWords(wordMap).toList.sortBy(_._2).reverse.take(n): _*)
 }
-{% endcodeblock %}
+````
+[WordCount.scala](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/utils/WordCount.scala)
 
 These calculations probably warrant a separate (and much shorter) article. For now let's just assume they do what the description states. The results of these computations are then pushed into the WebSocket channel towards the browser as JSON (embedded in an immutable instance of Case Class **[TweetState](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/models/Tweet.scala)**). That step actually involves another Enumerator / Iteratee couple, but more about that later.
 
 Let us now hook the Iteratee up with an Enumerator that will push data into it before dealing with the issue that the Iteratee is immutable and cannot be changed. In previous versions we probably would have used a **[PushEnumerator](http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.PushEnumerator)** to achieve this, but PushEnumerator is deprecated as of Play 2.10, we are supposed to use **[Concurrent.broadcast](http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.Concurrent$)** instead.
 
-{% codeblock Enumerator for tweetIteratee lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala Twitter.scala %}
+````scala
 /** Creates enumerator and channel for Tweets through Concurrent factory object */
 val (enumerator, tweetChannel) = Concurrent.broadcast[Tweet]
 
@@ -161,25 +168,26 @@ val subscriber = ActorStage.system.actorOf(Props(new Actor {
   def receive = { case t: Tweet => tweetChannel.push(t) }                         
 }))
 ActorStage.system.eventStream.subscribe(subscriber, classOf[Tweet]) // subscribe to incoming tweets
-{% endcodeblock %}
+````
+[Twitter.scala](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala)
 
 We call Concurrent.broadcast[Tweet], which returns a tuple2 of an Enumerator (named accordingly) and a channel (tweetChannel) that we can use to push Tweets into. We then attach our tweetListIteratee to the enumerator using the |>>> operator. The Tweets pushed into tweetChannel will then be consumed by the tweetListIteratee attached to the enumerator. We will get those Tweets from the **[Akka EventBus](http://doc.akka.io/docs/akka/2.1.2/scala/event-bus.html)** by creating an actor, which listens to events of type Tweet on the EventBus and pushes them into tweetChannel. We will look at the EventBus in more detail in the article dealing with the ImageProcessing actor hierarchy. For now it should be sufficient to know that we have a source of Tweets and push each individual occurence of a Tweet event into the tweetChannel, thus creating our own open-ended stream.
 
 Now that we have wired our building blocks together, let's see if we can visualize this in its initial state:
 
-{% img left /images/Iteratee1.svg 800 300 'image' 'images' %}
+![Iteratee](../images/Iteratee1.svg)
 
 We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, which acts as the consumer or sink of this information. Once it has reached the tweetlistIteratee, we would expect to have the Tweet within the rolling window of Tweets and also to have the interceptor function run.
 
 So far so good. But remember that the Iteratee is an immutable data type:
  
-{% blockquote Iteratee http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.Iteratee Play 2.10 API %}
-An Iteratee consumes a stream of elements of type E, producing a result of type A. The stream itself is represented by the Input trait. An Iteratee is an immutable data type, so each step in consuming the stream generates a new Iteratee with a new state.
-{% endblockquote %}
+>An Iteratee consumes a stream of elements of type E, producing a result of type A. The stream itself is represented by the Input trait. An Iteratee is an immutable data type, so each step in consuming the stream generates a new Iteratee with a new state.
+
+[Iteratee - Play 2.10 API](http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.Iteratee)
 
 Let's see what happens when we push a Tweet into the system:
 
-{% img left /images/Iteratee2.svg 800 300 'image' 'images' %}
+![Iteratee2](../images/Iteratee2.svg)
 
 The Tweet appears on the EventBus, is received by the subscribing actor, pushed into the tweetChannel and from there into the tweetlistIteratee by being applied to the **Cont** function inside that Iteratee, resulting in a new Iteratee with the Tweet prepended to the accumulator (and the tweetlistInterceptor function executed in the process, doing the statistic computations and pushing the result into the WebSocket connection to the client). This results in a brand new Iteratee.
 
@@ -187,7 +195,7 @@ This is what confused me initially. How does the Enumerator keep track of the cu
 
 It turns out it depends on the definition of mutable state and also on the kind of Enumerator. The **[WS](https://github.com/playframework/Play20/blob/2.1.0/framework/src/play/src/main/scala/play/api/libs/ws/WS.scala)** object or the now-deprecated [PushEnumerator](https://github.com/playframework/Play20/blob/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Enumerator.scala) use plain old vars to achieve this. Let's look at WS first because the construct is simpler than the one in **[Concurrent.scala](https://github.com/playframework/Play20/blob/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)**.
 
-{% codeblock WS Enumerator excerpts lang:scala https://github.com/playframework/Play20/blob/2.1.0/framework/src/play/src/main/scala/play/api/libs/ws/WS.scala WS.scala%}
+````scala
     // line 236
     var iteratee: Iteratee[Array[Byte], A] = null
      
@@ -204,29 +212,30 @@ It turns out it depends on the definition of mutable state and also on the kind 
           case Step.Cont(k) => {
             k(El(bodyPart.getBodyPartBytes()))
           }      
-{% endcodeblock %}
+````
+[WS Enumerator excerpts](https://github.com/playframework/Play20/blob/2.1.0/framework/src/play/src/main/scala/play/api/libs/ws/WS.scala)
 
 Above we see that the WS object stores the Iteratee as a plain old var, which is replaced in the pureFlatFold step by the subsequent Iteratee returned by k in the case that the Iteratee is in the Cont state. Okay, now this makes sense, the Enumerator does keep track of the next Iteratee to push information into. But mutable state, a var? This is actually fine and safe because this mutable var is contained locally and the WS connection will only run in a single thread anyways.
 
 Here we are not using this kind of Enumerator though, we are using Concurrent.broadcast. This one uses a much more interesting approach: STM (Software Transactional Memory) is used to store Refs to the next Iteratee. The [Akka documentation](http://doc.akka.io/docs/akka/2.1.0/scala/stm.html) names Clojure's approach as the motivation for the usage of STM within Akka, and it is a great and concise read, I recommend reading the whole thing. 
 
-{% blockquote Clojure's approach to Identity and State http://clojure.org/state clojure.org/state %}
-There is another way, and that is to separate identity and state (once again, indirection saves the day in programming). We need to move away from a notion of state as "the content of this memory block" to one of "the value currently associated with this identity". Thus an identity can be in different states at different times, but the state itself doesn't change. That is, an identity is not a state, an identity has a state. Exactly one state at any point in time. And that state is a true value, i.e. it never changes. If an identity appears to change, it is because it becomes associated with different state values over time. This is the Clojure model.
-{% endblockquote %}
+>There is another way, and that is to separate identity and state (once again, indirection saves the day in programming). We need to move away from a notion of state as "the content of this memory block" to one of "the value currently associated with this identity". Thus an identity can be in different states at different times, but the state itself doesn't change. That is, an identity is not a state, an identity has a state. Exactly one state at any point in time. And that state is a true value, i.e. it never changes. If an identity appears to change, it is because it becomes associated with different state values over time. This is the Clojure model.
+
+[Clojure's approach to Identity and State](http://clojure.org/state)
 
 Without wanting to go into too much detail, the difference when using STM is that references to immutable vals are stored, which are not manipulated in place but instead swapped against a new immutable val. Whatever is retrieved from the STM represents the state at the time of retrieval as an immutable fact. A later retrieval might return a different result, whatever is then the current state, but once the state is retrieved it stays the same throughout the lifecycle of that val, it cannot be changed elsewhere the way it could happen with a var (leading to odd behavior). This is one way to make shared state inside STM thread-safe, the other one is that every change to the shared state is transacted, with the ability to roll back when the state has been updated from elsewhere (e.g. another thread). Let's have a quick look how this changes the previous drawing in my understanding:
 
-{% img left /images/Iteratee3.svg 800 300 'image' 'images' %}
+![Iteratee3](../images/Iteratee3.svg)
 
 The enumerator adds the Iteratee to a list of Iteratees. Then the enumerator is not directly involved in calling the Iteratee any longer, instead the push function looks up the Iterator, calls Cont on it like in the previous example and eventually swaps it against the next Iteratee:
 
-{% img left /images/Iteratee4.svg 800 300 'image' 'images' %}
+![Iteratee4](../images/Iteratee4.svg)
 
 I will have to study **[Concurrent.scala](https://github.com/playframework/Play20/blob/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)** some more in order to understand how exactly this happens.
 
 Finally, we push the result of the computation in the previous step into the WebSocket connection towards the browser. Here once again we use Concurrent.broadcast to create the aforementioned enumerator / channel tuple, this time of type String. The channel is used to push String serialized JSON towards the client. We do not actually create the Iteratee here, instead we use the enumerator as part of the returned tuple in line 77 together with an Iteratee that we can use to process incoming information from the WebSocket connection. In this case, we use a very simple Iteratee which completely ignores all input:
 
-{% codeblock Enumerator for tweetIteratee lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala Twitter.scala %}
+````scala
  /** Line 35: Iteratee for incoming messages on WebSocket connection, currently ignored */
   val in = Iteratee.ignore[String]
 
@@ -239,7 +248,8 @@ Finally, we push the result of the computation in the previous step into the Web
   
   // line 77: return value in tweetFeed function 
   (in, out) // in and out channels for WebSocket connection
-{% endcodeblock %}
+````
+[Enumerator for tweetIteratee](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala)
 
 Instead of the Iteratee.ignore[String] we could define an Iteratee that processes information coming from the browser here, if so desired. This will be useful when allowing the client to send control commands towards the server through the WebSocket connection.
 

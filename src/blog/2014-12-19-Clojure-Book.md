@@ -7,8 +7,6 @@ categories:
 ---
 I thought about where to take my series about **[Building a System in Clojure](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** next and realized that I don't like the format of a **blog series** all that much. Instead, the format of a **book** seems like a better choice; one where you, the potential reader, are invited to provide feedback from the very first moment of the writing process. I have already started that process and for now I have transferred the existing articles from the series into the book without much further editing. Over the next couple of weeks, I will be working on making the content more consistent with the book format. The book is available for free on **[leanpub.com](https://leanpub.com/building-a-system-in-clojure)**. Iff (if and only if) you find the content to be of value, you can pay a suggested price, but that's entirely up to you and something you can decide on later.
 
-<!-- more -->
-
 The book format will allow me to write a consistent narrative around the flow of data through a system, where we will follow the journey of data from a streaming source to a user interface that updates changes according to new data from the streaming source immediately, or rather within a few hundred microseconds.
 
 As a sample application, we will use tweets streaming live from the Twitter Streaming API. In case you haven't seen it yet, this is how the application looks like:

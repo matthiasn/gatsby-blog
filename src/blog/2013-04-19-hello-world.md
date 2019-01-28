@@ -8,8 +8,6 @@ categories:
 **Who am I?**
 My name is Matthias and I had my first computer before I had my first bike. I've spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn't satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn't have any part in creating. I don’t.
 
-<!-- more -->
-
 After some wandering, I discovered what a delight it can be to write these amazing little things called 'programs' that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven't looked back since.
 
 **Why am I blogging?**

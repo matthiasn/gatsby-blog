@@ -21,7 +21,7 @@ This realization, together with the frustration from my **[Nginx](http://nginx.o
 
 The changes I needed to make are surprisingly simple:
 
-````
+````scala
 /** Serves WebSocket connection updating the UI */
 def tweetFeed = WebSocket.using[String] {
   implicit request =>
@@ -37,7 +37,7 @@ def tweetFeed = WebSocket.using[String] {
 
 becomes:
 
-````
+````scala
 /** Serves Server Sent Events over HTTP connection */
 def tweetFeed() = Action {
   implicit req => {
@@ -56,14 +56,14 @@ Before, any Tweet coming through the wsOutChannel would be enumerated into the W
 
 The changes on the client side are just as simple:
 
-````
+````js
   var ws = new WebSocket("@routes.Twitter.tweetFeed().webSocketURL()");
   ws.onMessage = handler
 ````
 
 becomes:
 
-````
+````js
   var feed = new EventSource('/tweetFeed');
   feed.addEventListener('message', handler, false);
 ````
