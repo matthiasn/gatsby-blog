@@ -3,7 +3,6 @@ import { Link, graphql } from "gatsby"
 import Layout from "../components/layout"
 import Container from '../components/container'
 import Helmet from 'react-helmet'
-import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
@@ -22,16 +21,14 @@ export default ({ data, location, pageContext }) => {
                 <h1>{post.frontmatter.title}</h1>
                 <time>{post.frontmatter.date}</time>
                 <div dangerouslySetInnerHTML={{ __html: post.html }} />
-                <Link to={pageContext.prev}>
-                    <FaArrowLeft style={{fontSize: "0.8em", marginRight: "5px"}}/>
-                    previous
-                </Link>
-                <Link to={pageContext.next}
-                      style={{marginLeft: "20px"}}>
-                    <i className={"fas fa-arrow-right"}/>
-                    <span>next</span>
-                    <FaArrowRight style={{fontSize: "0.8em", marginLeft: "5px"}}/>
-                </Link>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Link to={pageContext.prev}>
+                        <span>{ pageContext.prev ? "← " + pageContext.prev : null} </span>
+                    </Link>
+                    <Link to={pageContext.next}>
+                        <span>{ pageContext.next ? pageContext.next + " →" : null} </span>
+                    </Link>
+                </div>
             </div>
         </Layout>
     </Container>
