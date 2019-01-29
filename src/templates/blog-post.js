@@ -7,6 +7,7 @@ import Helmet from 'react-helmet'
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
     console.log("pageContext", pageContext)
+    const { prev, next } = pageContext
     return (
     <Container>
         <Helmet
@@ -22,12 +23,20 @@ export default ({ data, location, pageContext }) => {
                 <time>{post.frontmatter.date}</time>
                 <div dangerouslySetInnerHTML={{ __html: post.html }} />
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <Link to={pageContext.prev}>
-                        <span>{ pageContext.prev ? "← " + pageContext.prev : null} </span>
-                    </Link>
-                    <Link to={pageContext.next}>
-                        <span>{ pageContext.next ? pageContext.next + " →" : null} </span>
-                    </Link>
+                    <div>
+                        {prev && (
+                            <Link to={prev.fields.slug}>
+                                <span>{ prev ? "← " + prev.frontmatter.title : null} </span>
+                            </Link>
+                        )}
+                    </div>
+                    <div>
+                        {next && (
+                            <Link to={next.fields.slug}>
+                                <span>{ next ? next.frontmatter.title + " →" : null} </span>
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </div>
         </Layout>

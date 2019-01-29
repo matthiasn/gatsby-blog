@@ -33,6 +33,9 @@ exports.createPages = ({ graphql, actions }) => {
             fields {
               slug
             }
+            frontmatter {
+              title
+            }
           }
         }
       }
@@ -42,8 +45,8 @@ exports.createPages = ({ graphql, actions }) => {
         const posts = result.data.allMarkdownRemark.edges;
 
         posts.forEach(({ node }, index) => {
-            const prev = index === 0 ? false : posts[index - 1].node.fields.slug;
-            const next = index === posts.length - 1 ? false : posts[index + 1].node.fields.slug;
+            const prev = index === 0 ? false : posts[index - 1].node;
+            const next = index === posts.length - 1 ? false : posts[index + 1].node;
 
             createPage({
                 path: node.fields.slug,

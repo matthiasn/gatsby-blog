@@ -221,6 +221,7 @@ h1 {
   margin-left: 0;
   margin-right: 0;
   margin-top: 0;
+  margin-bottom: 0.3em!important;
   padding-bottom: 0;
   padding-left: 0;
   padding-right: 0;
@@ -621,8 +622,5 @@ time {
   display: block;
   font-family: 'Oswald';
   font-weight: 300;
-}
-
-h1 {
-  margin-bottom: 6px;
+  font-size: 0.9em;
 }
