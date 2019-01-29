@@ -7,8 +7,6 @@ categories:
 ---
 This is the first of **n** articles about building **systems** in **[Clojure](http://clojure.org/)**. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is **easy to understand and maintain**. Here is what I found.
 
-<!-- more -->
-
 As an example for such a system, we will be looking at the Clojure rewrite of an application I wrote last year: **[BirdWatch](https://github.com/matthiasn/BirdWatch)**. This application subscribes to the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** for all tweets that contain one or more terms out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)**.
 
 In this first installment we will be looking at the basic architecture of the server side. Let's start with an animation [^1] to demonstrate how components in the system get wired up when the application initializes before we go into details.
@@ -37,7 +35,7 @@ Here, unlike in object-oriented dependency injection, things are a little differ
 
 Let's have a look at how the initialization of the application we have already seen in the animation looks in code:
 
-{% codeblock Main namespace lang:clojure https://github.com/matthiasn/BirdWatch/blob/a26c201d2cc2c89f4b3d2ecb8e6adb403e6f89c7/Clojure-Websockets/src/clj/birdwatch/main.clj main.clj%}
+````clojure
 (ns birdwatch.main
   (:gen-class)
   (:require
@@ -78,7 +76,8 @@ Let's have a look at how the initialization of the application we have already s
   (pid/delete-on-shutdown! (:pidfile-name conf))
   (log/info "Application started, PID" (pid/current))
   (alter-var-root #'system component/start))
-{% endcodeblock %}
+````
+[Main namespace](https://github.com/matthiasn/BirdWatch/blob/a26c201d2cc2c89f4b3d2ecb8e6adb403e6f89c7/Clojure-Websockets/src/clj/birdwatch/main.clj)
 
 I personally think this **reads really well**, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the ````get-system```` function which declares, what components depend on what other components. The system is finally started in the ````-main```` function (plus the process ID logged and saved to a file). This is all there is to know about the application entry point. 
 

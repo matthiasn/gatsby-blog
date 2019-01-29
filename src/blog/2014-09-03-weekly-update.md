@@ -7,8 +7,6 @@ categories:
 ---
 In this weekly update, I will be talking about **why I started this blog** in the first place, **Pomodoro time management**, and the new **Clojure** and **ClojureScript** version of my **[BirdWatch](https://github.com/matthiasn/Birdwatch)** application. Again there is a live version, this time subscribing to all tweets containing the term **Ferguson**. Also, the results are out for the first month of **blog monetization** through **affiliate links**.
 
-<!-- more -->
-
 ## Why I started this blog in the first place
 Initially, when I started this blog, I wanted to explore real-time information processing. My initial project was the **[BirdWatch](https://github.com/matthiasn/Birdwatch)** application which has evolved quite a bit since the first version came out. But then, for a while, I focused more on frameworks and libraries than on the underlying architectural principles. That was probably also due to the fact that I was not convinced I really had the right tools in my toolbox. Well, that has changed. It is a luxury to use (roughly) the same language on both the server and the client, in particular if as a single developer you want to quickly explore an idea end-to-end.
 
@@ -24,11 +22,11 @@ Of course, there is also a live version running on my server. This time I did no
 
 Click the image or alternatively **[click here](http://birdwatch2.matthiasnehlsen.com/)** to open a live version of this application.
 
-<a href="http://birdwatch2.matthiasnehlsen.com/" target="blank"><img class="left" src="/images/bw-ferguson.png" title="BirdWatch Screenshot for term Ferguson" alt="BirdWatch Screenshot for term Ferguson"></a>
+<a href="http://birdwatch.matthiasnehlsen.com/" target="blank"><img class="left" src="/images/bw-ferguson.png" title="BirdWatch Screenshot for term Ferguson" alt="BirdWatch Screenshot for term Ferguson"></a>
 
 In the Pomodoro time management section above, I mentioned a little experiment I carried out to determine how much I would be able to achieve in a single 25-minute Pomodoro time interval. Yesterday I had the idea that I wanted to know how many clients were connected to the live version of this application at any given time. Right after I had the idea, I asked myself if this was doable in a single Pomodoro interval. So I set the timer and started right away. All of my thoughts concerning this feature, the implementation on both client and server, the testing (on Chrome, Firefox, Safari, and Opera), and the code documentation and prettification were done and there were still 76 seconds left before my digital kitchen timer started ringing. Almost time to take a little nap. Here's how that looks like, see the upper right corner:
 
-{% img left /images/bw-ferguson2.png 'Connection count feature' 'Connection count feature'%}
+![Connection count feature](../images/bw-ferguson2.png)
 
 Every other second, all clients are notified about the number of current number of simultaneous connections. It is really useful to have a message bus for different message types between client and server. More on that in a future article.
 

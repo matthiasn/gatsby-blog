@@ -7,13 +7,11 @@ categories:
 ---
 A few weeks ago I started working on the follow-up to my **[BirdWatch](https://github.com/matthiasn/BirdWatch)** project. This new project is another single page application based on **[AngularJS](http://angularjs.org)**, but that is not part of the story I am going to tell you today at all. Instead, today I will talk about **speed**. As in, how long does it take for a web page to load, on a mobile device? I was doing some research by opening different websites under suboptimal conditions, such as 3G with only two to three bars, or even worse the dreaded **E** with four to five bars. Not terribly difficult to simulate, I only need to disable the Wifi and walk into different corners of my apartment for that. Opening my own blog made me sad: with the bad 3G connection it took like **10 seconds** for the index page to show anything at all. No way I would ever wait that long for any page to load. And I would quite likely not even try again. So I went on a quest to make this better. The result is of course on **[GitHub](https://github.com/matthiasn/live-html5)**.
 
-<!-- more -->
-
 So what happens when the browser loads a page? First a DNS lookup takes place, translating the human-readable domain name into an IP address. Then that domain is contacted using an HTTP GET request for the particular URL. If no specific file is given in the request, a server will usually try to return a file named **index.html** inside the folder that maps to the request URL. This **index.html** then typically contains multiple links to stylesheets and scripts, all of which trigger the same cascade (minus the DNS lookup if subsequent requests point to the same domain). Many of the resources are blocking; the page will only display after they are loaded.
 
 We can examine the request behavior by looking at a timeline chart, like this one for the index page of this blog:
 
-{% img left /images/gtmetrix-blog.png 'image' 'gtmetrix result for matthiasnehlsen.com'%}
+![gtmetrix result for matthiasnehlsen.com](../images/gtmetrix-blog.png)
 
 You will notice that the **DOM loaded** event fired after more than an entire second (the blue line), or a little less than 200ms after the blocking screen.css has finished loading.
 
@@ -25,15 +23,15 @@ I wanted to know how much worse network round-trip times actually are on mobile 
 
 As a baseline measurement, I did the ping over Wi-Fi + DSL and got around 55ms on average:
 
-{% img left /images/iphone_ping_wlan.png 'image' 'iPhone ping wifi'%}
+![iPhone ping wifi](../images/iphone_ping_wlan.png)
 
 Interestingly this is about 25ms slower than what I got with the command line ping on my Mac on the same network. I have no idea where this delay comes from, could be something in iOS or in the Ping Lite app. But it doesn't really matter; a 25ms delay is not near as noticeable as the delay introduced by switching to a mobile network. Using 3G under ideal conditions (five bars) I consistently got a little less than 500ms:
 
-{% img left /images/iphone_ping_3g.png 'image' 'iPhone ping 3G'%}
+![iPhone ping 3G](../images/iphone_ping_3g.png)
 
 That is much worse than the Wi-Fi connection indeed, particularly when multiple files need to be loaded; then these times really add up. Not a big surprise that the Edge connection is even worse, particularly in terms of consistency:
 
-{% img left /images/iphone_ping_edge.png 'image' 'iPhone ping EDGE'%}
+![iPhone ping EDGE](../images/iphone_ping_edge.png)
 
 Thinking about the timeline, it is not hard to imagine what influence the higher round-trip times will have on the **DOM loaded** event when potentially multiple blocking requests have to be completed before the browser renders the page.
 
@@ -72,11 +70,11 @@ Finally, when I revisited the page speed issue, I implemented automatic CSS inli
 
 Here is the final result of Google PageSpeed Insights after all the automated optimizations:
 
-{% img left /images/pagespeed-100.png 'image' 'pagespeed 100 result'%}
+![pagespeed 100 result](../images/pagespeed-100.png)
 
 Great, this is what I wanted to see. Let us have a look at timeline chart for the sample page now. Arguably the complexity of this page is higher than the blog index page, so I think this is a fair comparison:
 
-{% img left /images/gtmetrix-live-html5.png 'image' 'gtmetrix result for optimized live-html5 page'%}
+![gtmetrix result for optimized live-html5](../images/gtmetrix-live-html5.png)
 
 The **DOM loaded** event now occurs after 86ms, which is more than 12 times faster than what we saw for the index page of the blog initially. It also happens after loading only 7.7KB. That will load much faster over a suboptimal mobile connection for sure. Note that the remaining two resources are not important for the perceived speed. All that matters is the HTML and the embedded styles. The picture is at the bottom of the page on a small screen anyways, and I bet no visitor will give up because a **[font-awesome symbol](http://fontawesome.io)** renders with some delay.
 

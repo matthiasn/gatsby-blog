@@ -7,8 +7,6 @@ categories:
 ---
 As I have no other article to publish this week, I thought a weekly update would be in order. Last week I wrote about **[making relevant and interesting talks more accessible](http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/)**. In the course of that project, I had **eleven** talks transcribed so far, four more than when I announced the project last week. Not only have I received great feedback about how appreciated this is, I have also learned a lot myself while proofreading the transcripts.
 
-<!-- more -->
-
 With all the stuff that I have learned and that I am still learning (with a few more talks in the pipeline), there are a couple of things that I want to rethink regarding the architecture of my **[BirdWatch application](https://github.com/matthiasn/BirdWatch)** before I continue with describing the architecture further. So let me think first before I publish the next article on the application's architecture. No worries, I expect to have the next one out next week, or the week after that the lastest.
 
 ## Thoughts from Guy Steele's talk on Parallel Programming

@@ -7,8 +7,6 @@ categories:
 ---
 Back in January I wanted to try out **[Om](https://github.com/swannodette/om)**. Now, I finally got around to doing so.
 
-<!-- more -->
-
 <blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/swannodette">@swannodette</a> Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.</p>&mdash; Matthias Nehlsen (@matthiasnehlsen) <a href="https://twitter.com/matthiasnehlsen/statuses/427945296971042816">January 27, 2014</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 

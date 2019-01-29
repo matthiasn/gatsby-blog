@@ -9,7 +9,7 @@ Today, I have another sample application for the **[systems-toolbox](https://git
 
 <a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="../images/sys-tb-tmp_local.gif" /></a>
 
-I wrote all of this from scratch in Clojure and ClojureScript, including the histogram - no charting libraries required. There's a live version, try it out by clicking on the animated GIF.
+I wrote all of this from scratch in **Clojure** and **ClojureScript**, including the histogram - no charting libraries required. There's a live version, try it out by clicking on the animated GIF.
 
 
 ## Systems Toolbox - Rationale
@@ -76,9 +76,9 @@ Cheers,
 Matthias
 
 
-[^1]: If you're interested in this real-time application for tweet stream analysis with multiple server-side processes and a ClojureScript frontend, you can either read the source code or buy my book about it. Beware that there's no substantial write-up about the library yet as the library is still changing quite a bit. But there will be soon.
+[^1]: If you're interested in this real-time application for tweet stream analysis with multiple server-side processes and a **ClojureScript** frontend, you can either read the source code or buy my book about it. Beware that there's no substantial write-up about the library yet as the library is still changing quite a bit. But there will be more soon.
 
-[^2]: The histogram is written entirely in ClojureScript and only making use of the systems-toolbox library and **[Reagent](http://reagent-project.github.io)**. So far, it is only part of the example application, but I'm planning on making a library component out of this chart and a few others. There certainly are a couple of ways that visual representations of system behavior can help in understanding systems.  
+[^2]: The histogram is written entirely in **ClojureScript** and only making use of the systems-toolbox library and **[Reagent](http://reagent-project.github.io)**. So far, it is only part of the example application, but I'm planning on making a library component out of this chart and a few others. There certainly are a couple of ways that visual representations of system behavior can help in understanding systems.  
 
 [^3]: I have heard this multiple times over the years, and I have no idea where it originates. 
 

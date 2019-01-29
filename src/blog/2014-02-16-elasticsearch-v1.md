@@ -7,8 +7,6 @@ categories:
 ---
 **[ElasticSearch](http://www.elasticsearch.org)** 1.0.0 is out, hooray! Great stuff, congrats to everyone involved. Not that I had any complaints about **v0.9**, but still, this is a great achievement. One of the changes is some **[major rework](http://www.elasticsearch.org/blog/percolator-redesign-blog-post/)** of the **[Percolation Query API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/search-percolate.html)**, making it much more powerful than before. Unfortunately, the update broke the percolation query mechanism in the **[BirdWatch](http://birdwatch.matthiasnehlsen.com)** application. But the fix wasn't very hard. So in today's article, I will revisit the topic of Percolation Queries by explaining what they are, how the new version has become more powerful and what was needed to fix my application. Please refer to this earlier **[article](http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/)** if you want to know more about the overall architecture of the **BirdWatch** application.
 
-<!-- more -->
-
 After running ````brew update```` and ````brew upgrade```` I noticed that live query result updates in my local installation did not work any longer. Pressing *F5* did show new intermittent Tweets though, so the system did not appear completely broken. A look into the ElasticSearch changelog quickly revealed that there had been some major rework on the Percolation API. Exactly this API is used for matching new Tweets to currently established streaming connections.
 
 ##So what is this percolation query thing?
@@ -23,7 +21,7 @@ In previous versions of Elasticsearch there was a single, specialized index for 
 
 Let us look at an example using **curl**. We have three persisted queries in our index:
 
-{% codeblock Percolation Queries lang:javascript %}
+````
 curl 'localhost:9200/persistent_searches/.percolator/_search?pretty=true'
 {
   "took" : 1,
@@ -54,11 +52,11 @@ curl 'localhost:9200/persistent_searches/.percolator/_search?pretty=true'
     } ]
   }
 }
-{% endcodeblock %}
+````
 
 Now if I insert a tweet in English that contains the words **Akka** and **Scala**, two of these queries should match. The second query matches anything that is in English and the third more specifically matches anything with these words. Let's see:
 
-{% codeblock Percolation Queries lang:javascript %}
+````
 curl 'localhost:9200/persistent_searches/tweets/_percolate?pretty=true' -d '{
 >     "doc" : {
 >         "text" : "blah, blah, akka blah, scala blah, blah",
@@ -81,8 +79,7 @@ curl 'localhost:9200/persistent_searches/tweets/_percolate?pretty=true' -d '{
     "_id" : "49d0feca545a82d29fffbdf6749dcf0086f9c44f6faa9b8e1e2e008b5716e488"
   } ]
 }
-{% endcodeblock %}
-
+````
 
 ##Changes to the BirdWatch code
 The URL format has changed, I have created the **persistent_searches** index, into which the queries of type **.percolator** are inserted. We have seen these URLs in action above already.
@@ -92,6 +89,7 @@ As mentioned above, percolation queries are now stored in a regular index that b
 In previous versions of ElasticSearch, there was no result header. Instead there was only a simple array of the matched query IDs. In **v1**, there is now a result header, just like in regular ElasticSearch queries, and the *matches* array. This array contains one object per resulting percolation query. Each of these match objects not only contains the *id* of the matching query but also the *index* where this search was stored. In this application we do not need any of this, so we can parse only the IDs of the matching queries: 
 
 {% codeblock Twitter Client lang:scala https://github.com/matthiasn/BirdWatch/blob/0ce1b15c27eb1ec9cbf29d9e95953cca68404cc0/app/actors/TwitterClient.scala TwitterClient.scala %}
+````scala
 /** Takes JSON and matches it with percolation queries in ElasticSearch
   * @param json JsValue to match against 
   */
@@ -105,7 +103,7 @@ def matchAndPush(json: JsValue): Unit = {
     }
   }
 }
-{% endcodeblock %}
+````
 
 Above, the tweet is **POSTed** to the *elasticPercolatorURL* inside the *doc* property of a **JSON** object. The result *res* is then parsed for the *matches* array as a List[Jsvalue], which is then mapped into a List[String] with the matching query IDs. Finally, a HashSet[String] is built from this list and pushed into the *jsonTweetsChannel* together with the json inside a **Matches** object. 
 

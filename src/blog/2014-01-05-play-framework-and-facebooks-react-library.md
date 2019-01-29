@@ -7,8 +7,6 @@ categories:
 ---
 Over the holidays I discovered Facebook's **[React](http://facebook.github.io/react)**, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, and I thought of one such application I still had running as a demo: **[sse-chat](https://github.com/matthiasn/sse-chat)**, a little chat application I wrote last summer to learn how to make **[Play Framework](http://www.playframework.com/)** and **[AngularJS](http://angularjs.org/)** cooperate in a very basic way. So I thought, why not rewrite the client side using **[React](http://facebook.github.io/react)**, offering the exact same functionality as the **[AngularJS](http://angularjs.org/)** version. Both are also available in the new version with no changes to the backend code except for the added route, as both versions can be accessed in parallel. 
 
-<!-- more -->
-
 The constraint of making it behave exactly like the AngularJS version was a great practice and it actually only took me an afternoon to complete. Touching the existing demo version also had me notice that the live version of it had been up for like 4 months or so, without any trouble. I have the same experience with my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/#/)** application. Kudos to the Play Framework and Akka developers for enabling such reliable server systems.
 
 Here's the new version using **React** instead of **AngularJS**:
@@ -17,7 +15,7 @@ Here's the new version using **React** instead of **AngularJS**:
 
 You can open the AngularJS version of the demo inside the **[article from last summer](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)** in another browser and communicate between the two, they share the same backend. Romeo and Juliet are having a chat in room 1, but hey, why not. Better than you just chatting with yourself. You can learn more about the server side in the previous article. In this article we will look exclusively at the web client. Here's an overview of the architecture with React:
 
-{% img left /images/react-sse-chat.png 'image' 'images'%}
+![](../images/react-sse-chat.png)
 
 So what is different with the **React** library? It offers a **declarative** approach just like AngularJS, but it is subtantially different in many quite interesting ways:
 
@@ -38,20 +36,21 @@ What I find most intriguing here is how React can work with immutable data. Angu
 
 I tried to use AngularJS with **[ClojureScript](https://github.com/clojure/clojurescript)** a few months back and I ran into a problem with **[infinite digest loops (StackOverflow)](http://stackoverflow.com/questions/19863873/angularjs-infinite-digest-loop-when-no-scope-changes)**, something I quite honestly didn't want to know about. So the problem seemed to be, and please correct me if I'm wrong, that ClojureScript was handing a shiny new data structure to AngularJS over and over again in order to guarantee immutability internally, just like Underscore generated a new data structure on every call to filter (see the StackOverflow discussion cited above). Angular needs to modify data in order to keep track of updates though, resulting in an infinite cycle that it fortunately is clever enough to stop after a few iterations. Let's have a quick look at what Angular does with data. It needs to mark individual elements in a collection with a **hashKey** property in order to keep track of their changes:
 
-{% img left /images/ng-hash-key.png 'image' 'images'%}
+![](../images/ng-hash-key.png)
 
 Now that's a problem when the data is considered immutable. I assume ClojureScript delivered fresh JavaScript objects from the ClojureScript data structures at the edge of the application where I called a function from Angular, with the result being that on subsequent calls the hashKey was always missing, making Angular upset. Let's emulate this behavior by getting the data for the ng-repeat from a function call that is guaranteed to deliver an array consisting of shiny new objects on every call:
 
 {% codeblock Causing an Infinite Digest Loop in Angular lang:javascript https://github.com/matthiasn/sse-chat/blob/e0b55172eede0f265cedf03cde46ae6b39639e82/app/assets/javascripts/controllers.js controllers.js %}
+````js
     var msgs = [];
     $scope.msgs = function () {
         return _.last(JSON.parse(JSON.stringify(msgs)), 3);
     }; 
-{% endcodeblock %}
+````
 
 Note that we also need to change the index.html to have the ng-repeat get the data from a function call, but just follow the link in the code block above to see the full source code for the branch I have created. With these changes in place, every subsequent call to the ***msgs*** function will be an array with newly generated objects, causing the following error on every single change to the application state, each of which triggers the digest cycle:
 
-{% img left /images/ng-digest.png 'image' 'images'%}
+![](../images/ng-digest.png)
 
 Note that the error output in the browser console is 23KB in size, even when using the minified production version of Angular, so I can only assume this is real problem.
 
@@ -66,6 +65,7 @@ Let's now have a look at the actual source code of the new React based client wr
 The HTML for our app becomes very simple. In this application it is called react.scala.html, but that's really only because it made the hookup to a route easier, otherwise there is no good reason to use a play/scala template here:
 
 {% codeblock react.scala.html lang:html https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/app/views/react.scala.html %}
+````html
 <body>
     <div id="chat-app"></div>
 
@@ -75,11 +75,12 @@ The HTML for our app becomes very simple. In this application it is called react
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script type="text/jsx" src="assets/js/react-app.js"></script>
 </body>
-{% endcodeblock %}
+````
 
 All we do above is provide a DOM element hosting the application markup plus loading the necessary scripts. All the interesting stuff happens inside **react.app.js**, which is loaded last. Let us go through, component by component, starting from the top of the hierarchy with the **ChatApp** component:
 
 {% codeblock ChatApp component lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** randomly generate initial user name */
 var initialName = function () { return "Jane Doe #" + Math.floor((Math.random()*100)+1) };
 
@@ -120,7 +121,7 @@ var ChatApp = React.createClass({
         </div>
     );}
 });
-{% endcodeblock %}
+````
 
 In this simple example, the ChatApp component is where most of the application logic lives in. I would probably prefer if it lived somewhere completely outside of React in more complex applications, for example in ClojureScript or Scala.js code, or in well-organized JavaScript code using underscore. Then not even the top element of the React application would need to have state at all. But in this simple example it should suffice to keep everything together in the top-level React component. So what goes on in said component?
 
@@ -133,6 +134,7 @@ In this simple example, the ChatApp component is where most of the application l
 Next let's look at the first child component of the single **ChatApp** component.
 
 {% codeblock NameRoomBox component lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** name and room selection component */
 var NameRoomBox = React.createClass({
     roomOpts: [1,2,3,4,5].map(function (room) { return <option value={room}>Room {room}</option> }),
@@ -146,7 +148,7 @@ var NameRoomBox = React.createClass({
         </div>
     );}
 });
-{% endcodeblock %}
+````
 
 In the **NameRoomBox** component, only two things actually happen:
 
@@ -156,6 +158,7 @@ In the **NameRoomBox** component, only two things actually happen:
 The next component inside **ChatApp** is the **MsgList** component:
 
 {% codeblock MsgList component lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** chat messages list component, renders all ChatMsg items (above) */
 var MsgList = React.createClass({
     render: function() {
@@ -165,11 +168,12 @@ var MsgList = React.createClass({
         return <div id="chat">{msgNodes}</div>;
     }
 });
-{% endcodeblock %}
+````
 
 The **MsgList** component only has one function: ***render***, which takes the array of messages provided as props and maps it into individual **ChatMsg** components, which we will look at next:
 
 {% codeblock ChatMsg component lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** single chat message component */
 var ChatMsg = React.createClass({
     render: function() { return (
@@ -180,11 +184,12 @@ var ChatMsg = React.createClass({
         </div>
     );}
 });
-{% endcodeblock %}
+````
 
 The **ChatMsg** component above only knows how to render itself. Depending on the name of the user sending a message, it is rendered in different colors by assigning the element different CSS classes. Now the last component to look at is the **SaySomethingBox**:
 
 {% codeblock SaySomethingBox component lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** chat message input component*/
 var SaySomethingBox = React.createClass({
     handleSubmit: function () {
@@ -204,7 +209,7 @@ var SaySomethingBox = React.createClass({
         </div>
      );}
 });
-{% endcodeblock %}
+````
 
 In the **SaySomethingBox** component, two things happen:
 + The ***render*** function renders the UI and attaches the ***handleSubmit*** function to the events fired by either submitting the form by pressing enter inside the ```<input>``` element or clicking the submit button.
@@ -213,9 +218,10 @@ In the **SaySomethingBox** component, two things happen:
 That's pretty much it, with one last function call to get the whole application started:
 
 {% codeblock React.renderComponent lang:javascript https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js react-app.js %}
+````js
 /** render top-level ChatApp component */
 React.renderComponent(<ChatApp />, document.getElementById('chat-app'));
-{% endcodeblock %}
+````
 
 ##Conclusion
 **[React](http://facebook.github.io/react)** offers an intriguing way of rendering potentially immutable data into a virtual DOM with every single change of the data. This virtual DOM will then be diffed against the current DOM (or, more likely, the previous version of the virtual DOM, but just guessing there) and then only the changes are performed on the real DOM, limiting the supposedly slow DOM manipulations to an absolute minimum. I have yet to convince myself about this, but reportedly this whole process is very fast, allowing for 60 FPS even in a mobile WebView, with JavaScript performaning a lot worse than in "real" browsers such as Mobile Safari, Mobile Chrome and any recent Desktop browser. React is also conceptually very simple; there are not a lot of things to understand. However I do feel that I need to develop better ideas on how to structure a larger application.

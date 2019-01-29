@@ -7,8 +7,6 @@ categories:
 ---
 **[Last week](http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/)** I wrote about blog monetization through the **[Amazon Affiliate Program](https://affiliate-program.amazon.com)**. I needed a way to serve country-specific URLs depending on the location of the page visitor, so I wrote a geo-aware link shortener using **[Play Framework](http://www.playframework.com)**. This week I would like to introduce that application. The source code is available on **[GitHub](https://github.com/matthiasn/amzn-geo-lookup)**. You may find that tool useful for your own purposes, or you may just want to read this as a tutorial on how to call backend services with Play Framework and the asynchronous **[WS client](http://www.playframework.com/documentation/2.3.2/ScalaWS)**.
 
-<!-- more -->
-
 Let us define the purpose of this application: visitors (for example on a blog) are to be redirected to country-specific banners, slideshows of or plain links to the matching Amazon store front of the country of origin of the request or, if none exists in the visitor's country, of the U.S. store. Links should be shortened as well. Let's look at an **example**. 
 
 The link for ```http://r.matthiasnehlsen.com/amazon-landing/link``` is requested. Then, depending on the visitor's country, the following happens:
@@ -29,11 +27,11 @@ All you really need to do is follow the **[instructions here](https://github.com
 ## Building the link shortener with Play Framework
 We will need to use three building blocks of Play applications: the **[WS client](http://www.playframework.com/documentation/2.3.2/ScalaWS)**, **[async controller actions](http://www.playframework.com/documentation/2.2.3/ScalaAsync)** and **[JSON parsing](http://www.playframework.com/documentation/2.2.3/ScalaJson)**. A client requests a resource, which is handled by an async action. Inside this action, the WS client performs a GeoIP lookup by calling the local freegeoip service. The result of this async WS call, which is JSON, is then parsed for the country code matching the request. Then the model is asked for the URL matching the requested resource and country. We will look at the source code below, but here is a flowchart first:
 
-{% img left /images/amzn-geo-lookup.png 'flowchart'%}
+![flowchart](../images/amzn-geo-lookup.png)
 
 I hope this flowchart helps a little in following through the source code below.
 
-{% codeblock Async controller action lang:scala https://github.com/matthiasn/amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/controllers/Application.scala Application.scala %}
+````scala
 package controllers
 
 import play.api._
@@ -88,13 +86,15 @@ object Application extends Controller {
       }
   }
 }
-{% endcodeblock %}
+````
+[Async controller action](https://github.com/matthiasn/amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/controllers/Application.scala)
 
 That is really all, including all the imports and four calls to a request logger. The actual code is a mere **23 lines** long, including error handling. Let's go through this line by line. *redirect* is a controller method that takes two parameters, *shortUrl* and *format*, both of which are strings. They come from the route definition:
 
-{% codeblock routes lang:text https://raw.githubusercontent.com/matthiasn/amzn-geo-lookup/e75c16d198f9f266fa63dbe463856982a1b4fe22/conf/routes routes %}
+````
 GET   /:shortUrl/:format   controllers.Application.redirect(shortUrl: String, format: String)
-{% endcodeblock %}
+````
+[routes](https://raw.githubusercontent.com/matthiasn/amzn-geo-lookup/e75c16d198f9f266fa63dbe463856982a1b4fe22/conf/routes)
 
 The above configuration means that the application will call *controllers.Application.redirect* with the two strings it parses out of the request's path. 
 
@@ -111,7 +111,7 @@ Now there is a second failure scenario where not the result code indicates what 
 ## The model
 Right now all the data lives in the model's source code. Obviously it would be better to utilize a database for this purpose, but for a first version, this serves us fine. The model is really just a **[Map](http://docs.scala-lang.org/overviews/collections/maps.html)**. Here's a shortened version as an example:
 
-{% codeblock Links model lang:scala amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/model/Links.scala Links.scala %}
+````scala
 package model
 
 object Links {
@@ -126,7 +126,8 @@ object Links {
     "amazon-landing.link.ES" -> "https://www.amazon.es/?_encoding=UTF8&camp=3626&creative=24822&linkCode=ur2&tag=matthiasne0ac-21",
   )
 }
-{% endcodeblock %}
+````
+[Links model](amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/model/Links.scala)
 
 ## Conclusion
 Building this geo-aware link shortener (in a very basic form) was really easy with **[Play Framework](http://www.playframework.com)**. I am currently using this tool for the lookup of Amazon store fronts to redirect affiliate links to the country of the visitor. But there is no reason why this can't be used for all kinds of other scenarios where such a country-specific redirection of requests might be useful.

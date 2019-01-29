@@ -7,8 +7,6 @@ categories:
 ---
 In this weekly update, I will show you how **git** helped me alleviate the disastrous consequences of a **brain fart**. I will also share my experiences with **Octopress**. You will learn what helps me **feel better**, day in and day out. Then, I'll talk about some changes regarding the **mailing list** for this blog. And last, there'll be **reviews** on my **audio setup** for a combined work / chill area and on the **Sony A7** full frame camera.
 
-<!-- more -->
-
 ## git vs brain fart
 The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more than I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed ````git add .```` on the command line.
 
@@ -16,10 +14,10 @@ So far so good. But then I got distracted by a rather annoying phone call. Durin
 
 In case you don't know this (destructive) **[git](http://git-scm.com/)** command, this is what it does:
 
-{% blockquote git-reset documentation http://git-scm.com/docs/git-reset %}
+````
 --hard
 Resets the index and working tree. Any changes to tracked files in the working tree made since <commit> will be discarded.
-{% endblockquote %}
+````
 
 Okay, think about that for a second. The documentation says it loud and clear. Changes to tracked files since **HEAD**, which is the current commit to which I have added above but not committed, are **discarded**. Oops.
 

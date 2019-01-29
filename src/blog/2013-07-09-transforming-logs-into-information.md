@@ -7,8 +7,6 @@ categories:
 ---
 Last week I was dealing with an odd behavior of the chat application demo I was running for **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. **Part I** describes the general approach and applies to any application out there, no matter what language or framework you are using. **Part II** describes one possible implementation of this approach using **[Play Framework](http://www.playframework.com)**.
 
-<!-- more -->
-
 ###Part I: Mining log data with Kibana and ElasticSearch
 I needed a way to filter events by event type and then visualize the events in a timeline, where vertical bars would indicate the number of items for a given time period. That would have made it immediately obvious that something was causing a delay in the delivery of messages to web clients. 
 
@@ -32,7 +30,7 @@ You can then open the **<a href="http://matthiasnehlsen.com/blog/2013/06/23/angu
 
 Here is another dashboard, this one shows all the messages that have been delivered over SSE. This is the one that would have helped me finding the timing issues I have mentioned in the beginning:
 
-{% img left /images/kibana2.png 'image' 'images' %}
+![](../images/kibana2.png)
 
 **<a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">CLICK HERE</a>** to have a look for yourself.
 
@@ -40,7 +38,7 @@ Note that **[Kibana](http://three.kibana.org)** comes with the tools to configur
 
 Making this logging approach to logging work is really simple. All you need to do is have your web application generate log data in the proper format and **[POST](http://tools.ietf.org/html/rfc2616#section-9.5)** it into the ElasticSearch index for the current day. This is how your **[JSON](http://tools.ietf.org/html/rfc4627)** log items could look like if you want to use Kibana out of the box:
 
-{% codeblock JSON item for SSE disconnect lang:javascript %}
+````js
 {  "_index" : "logstash-2013.07.07",
    "_type" : "play",
    "_source" : { "@source":"sse-chat", 
@@ -57,7 +55,7 @@ Making this logging approach to logging work is really simple. All you need to d
       "@message":"SSE disconnected",
       "@type":"INFO" }
  }
-{% endcodeblock %}
+````
 
 That should be fairly easy to generate, with any modern web framework. Logstash uses a daily index for log items. That makes it easy to archive or purge older entries. Kibana makes this transparent, it automatically pulls in the correct indices when a query spans multiple days. Field names starting with '@' are predefined by logstash. The predefined fields would be better than textfile-based logging on their own because of the full-text search capabilities within ElasticSearch. It becomes extremely handy once you start making use of '@fields': you can store arbitrary **[JSON](http://tools.ietf.org/html/rfc4627)** in here and use the fields in the Kibana dashboard later. For example I am storing the geolocation data in here, in addition to data about browser and OS. It can be anything. All of the fields will become available in within Kibana, no further work necessary.
 
@@ -69,7 +67,7 @@ Let us implement this in Scala and Play using the **[sse-chat sample application
 So without further ado, here is the Logger object:
 
 {% codeblock Logger Object (partially) Controller lang:scala https://github.com/matthiasn/sse-chat/blob/4f118e5e73b17036ab0168ba78faa2061074a259/app/utilities/Logger.scala Logger.scala %}
-
+````scala
 /** LogStash-format logger, allows passing anything that can 
  * be expressed as a JsValue in addition to standard fields
  * @param sourcePath  source path of event 
@@ -91,7 +89,7 @@ def log(sourcePath: String, msg: String, eventType: String, fields: Option[JsVal
     )
     WS.url(elasticURL + "/logstash-" + indexFmt.print(now) + "/play").post(logItem)
 }
-{% endcodeblock %}
+````
 
 Above I am showing the basic logging functionality. All I am doing is to create a logstash-formatted **[JSON](http://tools.ietf.org/html/rfc4627)** object and then POSTing it into the ElasticSearch index for the current day. Note that I am using UTC, this is more a personal preference than anything. Kibana will convert this to your local time if you so choose. The Geo-IP lookup is not the topic of this article, but have a look at the full source code, it should be pretty self-explanatory if you understand the code above. I'd be happy to add a section on this if there is demand. 
 

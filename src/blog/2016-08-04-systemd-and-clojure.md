@@ -23,14 +23,9 @@ While my applications were running rock solid for months in a row until I finall
 
 This library also happens to be a sweet opportunity to write a minimal **[systems-toolbox](https://github.com/matthiasn/systems-toolbox)** system, with a scheduler component that emits messages every so often, and then calls systemd via **[JNA](https://github.com/java-native-access/jna)**.
 
-This is the entire library:
+This is the entire [library](https://github.com/matthiasn/systemd-watchdog/blob/65266f579fa32b87811c77629969cb3d71c30c49/src/clj/matthiasn/systemd_watchdog/core.clj#L6):
 
-````
-(ns matthiasn.systemd-watchdog.core
-  (:require [matthiasn.systems-toolbox.switchboard :as sb]
-            [matthiasn.systems-toolbox.scheduler :as sched])
-  (:import [info.faljse.SDNotify SDNotify]))
-
+````clojure
 (defn start-watchdog!
   "Call systemd's watchdog every so many milliseconds.
    Requires the NOTIFY_SOCKET environment variable to be set, otherwise does
@@ -53,13 +48,14 @@ This is the entire library:
                          {:timeout timeout
                           :message [:wd/send]
                           :repeat  true}]}]
+       [:cmd/route {:from :wd/scheduler-cmp :to :wd/notify-cmp}]])))
 ````
 
 It fires up a **switchboard**, which manages and wires systems, the `:wd/notify-cmp`, which calls `(SDNotify/sendWatchdog)` from the **[SDNotify library](https://github.com/faljse/SDNotify)**, and a scheduler component, which emits `:wd/send` messages every `timeout` milliseconds. You can build much more complex applications with the **systems-toolbox**, e.g. **[BirdWatch](http://birdwatch.matthiasnehlsen.com)**. The 14 lines above (plus comments and imports) however are about the minimum case when some scheduling is desired.
 
 You can have a look at the mentioned examples if you're interested in building systems with the systems-toolbox. In subsequent articles, I will introduce them in detail. For now, you can just use the library in your projects if you want to have your application monitored by systemd. It's just a one-liner, as you can see for example in the **[trailing mouse pointer example](https://github.com/matthiasn/systems-toolbox/blob/master/examples/trailing-mouse-pointer/src/clj/example/core.clj#L41)**: 
 
-````
+````clojure
   (wd/start-watchdog! 5000)
 ````
 

@@ -7,13 +7,11 @@ categories:
 ---
 I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to work in for a single article, but then again there is enough interesting stuff going on in this new version that calls for multiple blog articles. Initially this application was only meant to be an exercise in streaming information to web clients. But along the way I noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:
 
-<!-- more -->
-
 BirdWatch is an open-source real-time tweet search engine for a defined area of interest, and  I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> for software engineering related tweets. The application subscribes to all tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)**. The limitation here is that the delivery is capped at one percent of all tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than **[400 million tweets per day](http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter)**.
 
 Here is how it looks like:
 
-{% img left /images/130812-screenshot.png 'image' 'images' %}
+![](../images/130812-screenshot.png)
 
 As you can see above, there is now a search bar which allows you to narrow down the selection of tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time the link is opened, not at the time it is bookmarked. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.
 

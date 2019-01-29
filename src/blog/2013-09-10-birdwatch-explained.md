@@ -8,8 +8,6 @@ categories:
 **[BirdWatch](http://birdwatch.matthiasnehlsen.com)** is an **[open-source](https://github.com/matthiasn/BirdWatch)** reactive web application that consumes the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** for a selection of terms. It processes those matching tweets in a server side application that is based on **[Play Framework](http://www.playframework.com)**. The tweets are then stored inside **[ElasticSearch](http://www.elasticsearch.org)**, where they are available for complex full-text searches. 
 On the client side, a **[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application)** based on **[AngularJS](http://angularjs.org)** allows the user to perform a live search for tweets with certain keywords and to do some analysis on them, such as word count statistics, activity over time and sorting results by followers and retweet counts.
 
-<!-- more -->
-
 Searches are conducted in real time thanks to so called **[Percolation queries](http://www.elasticsearch.org/guide/reference/api/percolate/)** within ElasticSearch. Besides being used to retrieve previous matches, each search is also registered with ElasticSearch. New tweets are then matched against existing queries and delivered to the client via **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)**. This will be explained in more detail in the ElasticSearch section towards the end of this article. The client side visualizations based on **[D3.js](http://d3js.org)** are then updated with those new search results.
 
 {% img left /images/bw_expl_beer.png 'image' 'images'%}

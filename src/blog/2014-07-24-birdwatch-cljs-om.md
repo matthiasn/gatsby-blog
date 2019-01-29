@@ -9,8 +9,6 @@ categories:
 
 I **[wrote](http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/)** about having written my first actual application using **[ClojureScript](https://github.com/clojure/clojurescript)** and **[Om](https://github.com/swannodette/om)**, a web client for my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/cljs/#*)** application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om. Then I want to start describing the implementation details. I am fully aware that what has come out of it up until now is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :) 
 
-<!-- more -->
-
 Click the screenshot below to see a live version of the application:
 
 <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a>
@@ -86,7 +84,7 @@ Let us now have a look at the implementation of the BirdWatch client.
 
 The most important part to understand is that the application state lives in one large **[atom](http://clojure.org/atoms)**. When the application is started, this atom is populated with the return of a function that returns a map representing a clean slate version of the application state. Here is how that function looks like:
 
-{% codeblock Function returning initial application state lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/util.cljs util.cljs (Lines 72 to 83)%}
+````clojure
 (defn initial-state [] 
   "function returning fresh application state"
   {:count 0
@@ -104,18 +102,20 @@ The most important part to understand is that the application state lives in one
    :by-rt-since-startup (priority-map-by >)
    :by-id (priority-map-by >)
    :words-sorted-by-count (priority-map-by >)})
-{% endcodeblock %}
+````
+[Function returning initial application state](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/util.cljs)
 
 All the keys in this map are **[keywords](http://clojure.org/data_structures#Data%20Structures-Keywords)**. Keywords have the great property that we can use them as functions that take a map as an argument and that then return the value for this key. We will see that in action further below.
 
 Upon startup of the application, the function above is called for populating the state atom:
 
-{% codeblock Function returning initial application state lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs core.cljs (lines 13 to 16)%}
+````clojure
 ;;; Application state in a single atom
 ;;; Will be initialized with the map returned by util/initial-state.
 ;;; Reset to a new clean slate when a new search is started.
 (def app-state (atom (util/initial-state)))
-{% endcodeblock %}
+````
+[Function returning initial application state](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs)
 
 As we have learned above, **def** creates a thing with a name. This thing is conceptually **[immutable](http://en.wikipedia.org/wiki/Immutable_object)**, at least we treat it that way, so I won't call it a variable. The atom is always the same object, but it holds different versions over time. Then a reference to this **[atom](http://clojure.org/atoms)** is passed around. When an update is desired, the map is dereferenced, an updated version is created using some function call and the result is then written back into the atom using a transaction. It is important to note that Clojure data structures are immutable. Immutability guarantees that you can pass data structures around without having to worry that whoever you pass it to might change the data. Data also does not become invalid. Instead, whatever version in time you get a hold on represents the definite state at the time that version was created. State changes only happen inside a transaction, in which a new and altered version of the state is passed back. The transaction part would also mean that no other process could alter state at the same time; in that case the later transaction would be retried until the first one has succeeded. This would be particularly useful when running in a multithreaded environment. However, the JavaScript code resulting from the ClojureScript compilation process runs in a single threaded event loop so only one thing at a same time can happen anyway. On the server side this property becomes more valuable, still.
 
@@ -124,7 +124,7 @@ Having a function that provides an initial, clean state makes it trivial to rese
 ##Ingesting tweets
 Tweets get into the system for further analysis in two ways. First, there is a Server Sent Event stream continuously delivering new matches to a query, with low latency (typically around a second between tweeting and having the tweet show up in the application). In addition, previous tweets are loaded. Both are triggered in the **start-search** function:
 
-{% codeblock start-search function lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs tweets.cljs (lines 49 to 59)%}
+````clojure
 (defn start-search [app tweets-chan]
   "initiate new search by starting SSE stream"
   (let [search (:search-text @app)
@@ -136,7 +136,8 @@ Tweets get into the system for further analysis in two ways. First, there is a S
     (swap! app assoc :stream (js/EventSource. (str "/tweetFeed?q=" s)))
     (.addEventListener (:stream @app) "message" #(receive-sse tweets-chan %) false)
     (doall (for [x (range 5)] (ajax/prev-search s 500 (* 500 x))))))
-{% endcodeblock %}
+````
+[start-search function](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs)
 
 Let's go through this line by line. The **defn** macro denotes a function named *start-search* which takes two arguments, *app* for a reference to the application state and *tweets-chan*, a channel to put tweets onto. Channels are building blocks in **[core.async](https://github.com/clojure/core.async)**. We will get to that in a little bit. For now, just think about a channel as a conveyor belt onto which one part of the application puts data. On the other end, another part of the application picks up the data, but the sender does not need to know about it. Broadly speaking, it is a sweet way to decouple parts of an application.
 
@@ -146,12 +147,13 @@ Next, we close a previous Server Sent Event stream, should one exist. This is on
 
 In the next line, we create a new EventSource object for the live stream of tweets and store it under the *:stream* key, to which we then attach a function as an event listener. We are using an anonymous function literal here because the *receive-sse* function takes two arguments (a channel and an event from the EventSource object) whereas the event listener requires a function that only takes a single argument. Then, finally, we call *ajax/prev-search* with 5 chunks of 500 results each, but we will look at that later. For now let's focus on the *receive-sse* function:
 
-{% codeblock receive-sse function lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs tweets.cljs (lines 44 to 47)%}
+````clojure
 (defn receive-sse [tweets-chan e]
   "callback, called for each item (tweet) received by SSE stream"
   (let [tweet (js->clj (JSON/parse (.-data e)) :keywordize-keys true)]
     (put! tweets-chan tweet)))
-{% endcodeblock %}
+````
+[receive-sse function](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs)
 
 This is a function with two arguments, a channel and an event. In the **let-binding**, the event is parsed into a tweet. This reads inside out: **1)** get event data **2)** parse JSON into a JavaScript object **3)** convert the JavaScript object into a Clojure(Script) Map. Note that for the conversion into a Clojure Map, we can automatically have the keys converted into keywords using *:keywordize-keys true*. This is convenient as we can later use the keywords as functions to retrieve values for the respective key. Then the *tweet* from the let binding is *put!* onto the *tweets-chan*, which represents the aforementioned conveyor belt, where we do not need to worry about who picks up the items on the other end.
 
@@ -159,7 +161,7 @@ Now is a good time to talk a little more about those channels. Channels are brou
 
 I am really only scratching the surface of what can be achieved with CSP, but it does seem like a useful abstraction to decouple parts of an application. Besides the aforementioned *tweets-chan* there also is a channel for previous tweets retrieved using Ajax calls (we will cover that part next):
 
-{% codeblock Channels lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs core.cljs (lines 37 to 44)%}
+````clojure
 ;;; Channels for handling information flow in the application.
 (def tweets-chan (chan 10000))
 (def prev-tweets-chan (chan 10000))
@@ -168,38 +170,42 @@ I am really only scratching the surface of what can be achieved with CSP, but it
  (let [[t chan] (alts! [tweets-chan prev-tweets-chan] :priority)]
    (tweets/add-tweet t app-state word-cloud)
    (recur)))
-{% endcodeblock %}
+````
+[Channels](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs)
 
 Above, two channels have been defined. Then, inside the *go-block*, *alts!* with *:priority* takes one of the items from the two channels, with priority on the first one. That is because live tweets should always be processed immediately whereas previous results can wait. With this item *t* taken from one of the channels, the *add-tweet* function in the *tweets* namespace is called. Finally, the go-loop runs continuously using *recur*. 
 
 Before looking at the *tweets* namespace, let's have a quick look at the Ajax call performed in the *start-search* function above:
 
-{% codeblock prev-search lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs ajax.cljs (lines 35 to 40)%}
+````clojure
 (defn prev-search [query-string size from]
   (json-xhr
     {:method :post
      :url "/tweets/search"
      :data (query query-string size from)
      :on-complete #(put! ajax-results-chan %)}))
-{% endcodeblock %}
+````
+[prev-search](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs)
+
 
 Above, we see a function that takes a query string, the expected number of items in the result and an offset. It then calls *json-xhr* from the imported **[goog.net.XhrIo](http://docs.closure-library.googlecode.com/git/class_goog_net_XhrIo.html)** with a map specifying method, url, data and an event handler. **XhrIo** comes with **[Google's Closure Compiler](https://developers.google.com/closure/compiler/)** that is used in the ClojureScript to JavaScript compilation process. 
 
 The query itself is generated by the *query* function in the same namespace:
 
-{% codeblock Ajax lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs ajax.cljs (lines 19 to 23)%}
+````clojure
 (defn query [query-string size from]
   {:size size :from from
    :sort {:id "desc"}
    :query {:query_string {:default_field "text" :default_operator "AND"
                           :query (str "(" query-string ") AND lang:en")}}})
-{% endcodeblock %}
+````
+[Ajax](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs)
 
 This function generates the map with the properties required for the ElasticSearch query on the server side. This query will eventually go on the wire as JSON. 
 
 Then finally, as an event handler, there is an anonymous function literal that puts the result onto another channel for the Ajax results:
 
-{% codeblock Ajax results channel and Go Loop lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs ajax.cljs (lines 11 to 17)%}
+````clojure
 (def ajax-results-chan (chan))
 (go-loop []
          (let [parsed (js->clj (JSON/parse (<! ajax-results-chan)) :keywordize-keys true)]
@@ -207,13 +213,14 @@ Then finally, as an event handler, there is an anonymous function literal that p
              (when (= 0 (mod (:_id t) 200)) (<! (timeout 10)))
              (put! cljs-om.core/prev-tweets-chan (:_source t)))
            (recur)))
-{% endcodeblock %}
+````
+[Ajax results channel and Go Loop](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs)
 
 Above, the JSON for each item on the channel is parsed into a Clojure(Script) data structure, where *parsed* is a vector. Then, each item in that vector is *put!* onto the *prev-tweets-chan*. Here, the value for the *:_source* key is used here as that is where ElasticSearch stores the original item. One thing to note here is the usage of a **[timeout](https://clojure.github.io/core.async/#clojure.core.async/timeout)** roughly every 200 tweets. I have introduced this in order to occasionally return control to the **[JavaScript Event Loop](http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/)** so that **a)** the UI gets rendered and **b)** the event listener for tweets from the Server Sent Event stream can do its thing. Otherwise, the application just appears to halt until all previous tweets have been processed, which is really annoying. But this seems rather hacky, I would be really curious about solving this problem more elegantly.
 
 With the preloading of tweets using Ajax calls covered, we can now proceed to the processing of tweets inside the *tweets* namespace. As we have seen before with the go loop alternating between channels, *add-tweet* is called for each tweet coming into the application:
 
-{% codeblock add-tweet function lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs tweets.cljs (lines 33 to 42)%}
+````clojure
 (defn add-tweet [tweet app word-cloud]
   "increment counter, add tweet to tweets map and to sorted sets by id and by followers"
   (let [state @app]
@@ -224,7 +231,8 @@ With the preloading of tweets using Ajax calls covered, we can now proceed to th
     (add-rt-status app tweet)
     (wc/process-tweet app (:text tweet))
     (. word-cloud (redraw (clj->js (wc/get-words app 250))))))
-{% endcodeblock %}
+````
+[add-tweet function](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs)
 
 First of all, for each new tweet, the counter inside the application state is swapped with the number incremented by one. Then, *add-to-tweets-map* is called (described below), which as the name suggests adds the current tweet to the map that is found under the *:tweets-map* key in the application state. Before being added, each tweet is also processed; in that step, for example, user mentions and links are replaced with the correct HTML representation. 
 
@@ -232,13 +240,14 @@ For a better understanding: the application allows displaying the tweets in diff
 
 Here is how a tweet is added to the application state:
 
-{% codeblock add-to-tweets-map function lang:clojure https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs tweets.cljs (lines 11 to 15)%}
+````clojure
 (defn add-to-tweets-map [app tweets-map tweet]
   "adds tweet to tweets-map"
   (swap! app
          assoc-in [tweets-map (keyword (:id_str tweet))]
          (util/format-tweet tweet)))
-{% endcodeblock %}
+````
+[add-to-tweets-map function](https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs)
 
 The function above takes the application state, the keyword under which the tweets-map can be found in the application state and a tweet to be added. It then swaps the application state with a new version into which the tweet is added after undergoing the *format-tweet* treatment. Note that *assoc-in* takes a vector that describes the path to the item being added or changed. The string representation of the tweet ID is converted to a keyword so that it can be used as a lookup function later (as previously described). Let's assume we have a tweet with ID string "12345". The path passed to *assoc-in* will then look like this: [:tweets-map :12345]. Afterwards, the map stored under the *:tweets-map* key will have a new key *:12345* with the formatted tweet as the associated value. A call to this function will also replace an already existing item.
 

@@ -7,8 +7,6 @@ categories:
 ---
 Hamburg is the second largest city in Germany, and as such it really should have an **AngularJS Meetup**. It hasn't had one until now, so I founded one.
 
-<!-- more -->
-
 I did server side development for the most of the last seven months but I finally had a chance to write an internal web application at work using **[AngularJS](https://angularjs.org)** and I was pleasantly surprised how much I enjoyed the process. AngularJS provides you with quite a useful way of structuring an application with services, controllers, directives, centralized configuration and, most importantly, **[dependency injection](http://en.wikipedia.org/wiki/Dependency_injection)** for wiring parts of an application together.
 
 While working on the AngularJS application I noticed that I did not really have enough people to talk to when it came to single-page applications and user experience, so I started to look for a nearby **[AngularJS](https://angularjs.org)** meetup. 

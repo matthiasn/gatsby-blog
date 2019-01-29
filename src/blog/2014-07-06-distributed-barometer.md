@@ -8,9 +8,7 @@ categories:
 Later this month, I'll be going on a hiking tour in the Alps around the **[Matterhorn](http://en.wikipedia.org/wiki/Matterhorn)**. I do not recall exactly why I said yes to this tour; maybe because I did not know then that during the ten days we'd climb a combined total of **10,500 meters** (roughly 34,500 feet). But on the other hand, that's an interesting challenge for a person with a sedentary job.
 Now, me being me, I would love to have a way to track the current altitude plus the combined ascent. **[GPS](http://en.wikipedia.org/wiki/Global_Positioning_System)** can help here, but the best sensor that's up to the task task appears to be a **[barometer](http://en.wikipedia.org/wiki/Barometer)**. 
 
-<!-- more -->
-
-{% img left /images/matterhorn.jpg 'image' 'images'%}
+![matterhorn](../images/matterhorn.jpg)
 
 GPS sensors only have an accuracy of **[±45m in the vertical axis](http://www.xcmag.com/2011/07/gps-versus-barometric-altitude-the-definitive-answer/)**, which makes them less than ideal for measuring combined ascent unless readings are averaged over longer periods. However, averaging would not only alias the otherwise occurring zigzag lines from the measurement errors, but also the real ups and downs in the terrain that you actually want to measure. Though a barometer can capture these small changes much better, it is prone to a shift over the day as the atmospheric pressure changes with the weather. It appears that the averaged GPS readings, while not all that useful for capturing altitude changes in unknown terrain - could be used to correct the barometric height from time to time. When the barometric height deviates by more than 45m from the averaged GPS altitude, we know that a correction is due.
 

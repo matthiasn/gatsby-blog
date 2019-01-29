@@ -7,16 +7,14 @@ categories:
 ---
 In this weekly update, I will discuss how I turned the load times for this **[Octopress](http://octopress.org/)**-powered blog **from terrible to pretty decent**. In **[PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com)** numbers: before the optimization <strong style="color:#DD0000;">58/100</strong> for mobile and <strong style="color:#EE8800;">77/100</strong> for desktop; after the optimization <strong style="color:#00AA66;">94/100</strong> for mobile and <strong style="color:#00AA66;">96/100</strong> for desktop. More concretely: on a lousy mobile connection, the load time improved from **32 seconds** to a mere **5 seconds**. Now we're talking. You would presumably **not have waited** for 32 seconds, and neither would I. Also, I have a status update on the **[Clojure](http://clojure.org/)** version of **[BirdWatch](https://github.com/matthiasn/Birdwatch)**.
 
-<!-- more -->
-
 ## Making this page load fast, even on a pre-3G mobile connection
 Some time ago I attempted to open my blog on my smart phone and, to my dismay, it took like forever to load. I noticed that I did not have a **[3G](http://en.wikipedia.org/wiki/3G)** connection at the time but come on, you should be able to open the page even if you only have an **[Edge](http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution)** connection with decent signal strength at your disposal. I was **sad**. Then I ran Google's **[PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com)** and that tool confirmed that things weren't rosy:
 
-{% img left /images/pagespeed_before.png 'PageSpeed results before optimization' 'PageSpeed results before optimization'%}
+![PageSpeed results before optimization](../images/pagespeed_before.png)
 
 <strong style="color:#DD0000;">Red</strong> for mobile. That's exactly how I would describe my previous experience. Now, after a couple of simple changes, here is how things look **now**:
 
-{% img left /images/pagespeed_after.png 'PageSpeed results after optimization' 'PageSpeed results after optimization'%}
+![PageSpeed results after optimization](../images/pagespeed_after.png)
 
 Not only does that look substantially better, it also makes <strong style="color:#00AA66;">all the difference</strong> in terms of user experience. I subjected a friend of mine to a tiny experiment involving his smart phone. The blog had never been loaded on it before, so certainly nothing was cached. We switched off the Wifi connection and **disabled 3G** so all that remained was four bars of an **[Edge](http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution)** connection. Initially, we loaded the new and optimized version, and it took a mere **5 seconds** until the page was visible and properly styled, except for the right web font. His reaction was **"wow, that was fast"** considering that we were on a really sluggish network connection. Next, we opened the old version with none of the optimizations, and that took a prohibitive **32 seconds**. From half a minute to 5 seconds, that is a hugely desirable improvement. Let's now have a look at what was necessary for this <strong style="color:#00AA66;">triumph</strong> over the intricacies and pitfalls of speedy web page delivery.
 
@@ -30,7 +28,7 @@ In order to not hold up page loading by fetching the ````screen.css```` and bein
 ### Nginx instead of hosted page
 Before, I was using a hosted web page where I had no real influence over how the files were served. Specifically, I had no control over **[HTTP compression](http://en.wikipedia.org/wiki/HTTP_compression)** settings, **[ETags](http://en.wikipedia.org/wiki/HTTP_ETag)** or **[HTTP caching](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching)**. In addition, it was also increasingly annoying to update the content because the only available method was **[FTP](http://en.wikipedia.org/wiki/File_Transfer_Protocol)**. When I got started with the blog, that was bearable, but with an increasing number of files, specifically images, it started to take a few minutes. What I really wanted instead was to use either **[rsync](http://en.wikipedia.org/wiki/Rsync)** or **[git](http://git-scm.com/)**. I had a server already (the one used, for example, for serving **BirdWatch**) with **[nginx](http://nginx.org)** running, so the first thing I did was move my blog over there and reconfigure the domain's **[DNS](http://en.wikipedia.org/wiki/Domain_Name_System)** settings. Here is the section of the **nginx.conf** that is now responsible for serving the blog:
 
-{% codeblock nginx config lang:text nginx.conf %}
+````
 user www-data;
 worker_processes 4;
 pid /var/run/nginx.pid;
@@ -82,7 +80,7 @@ pt application/xml application/xml+rss text/javascript;
     }
   }
 }
-{% endcodeblock %} 
+````
 
 I'm no expert in the subject of **nginx configuration**, but the above seems to be working well for what I am trying to do. If you are more knowledgeable and spot any nonsense in there, please let me know. Note that ````www.matthiasnehlsen.com```` is forwarded to the same host but without ````www.```` in front of all URLs. This is to make Google happy as it would otherwise **index both versions as separate entities** and thus potentially **dilute the rank** at which the page appears in search results.
 
@@ -98,13 +96,13 @@ For the blog, I am using a non-standard **[web font](http://en.wikipedia.org/wik
 ### What else could be done?
 Short answer in my case: **nothing really**. With these changes in place, **[PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com&tab=mobile)** now only complains about items that are outside of my sphere of influence:
 
-{% img left /images/pagespeed_after2.png 'pagespeed results after optimization' 'pagespeed results after optimization'%}
+![pagespeed results after optimization](../images/pagespeed_after2.png)
 
 I could remove the **[GitHub buttons](https://github.com/mdo/github-buttons)**, the **[analytics script](http://www.google.com/analytics/)** and the **web font** altogether just to get an even higher score, but I won't. I am happy with the results and I am not willing to forego any of them. I also find it somewhat odd that one Google tool (PageSpeed Insights) complains about the script of another Google tool (Google Analytics) - as if I could do anything about that! In addition, I think that the complaint about leveraging longer cache times for the GitHub API calls is **plain wrong**. Those are **[JSONP](http://en.wikipedia.org/wiki/JSONP)** calls rather than static content. Arguably, the resource need not be cached at all if we want the result to be accurate.
 
 I also ran **[YSlow](https://developer.yahoo.com/yslow/)**, which seemed pretty happy with the optimizations as well:
 
-{% img left /images/yslow.png 'YSlow results after optimization' 'YSlow results after optimization'%}
+![YSlow results after optimization](../images/yslow.png)
 
 <strong style="color:#00AA66;">Grade A (94/100)</strong> sounds much better than the <strong style="color:#EE8800;">Grade C (78/100)</strong> that YSlow previously gave this blog.
 

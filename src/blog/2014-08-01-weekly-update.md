@@ -7,8 +7,6 @@ categories:
 ---
 Here's something new to try: a weekly update, covering pretty much of what I keep myself busy with. That may be about what I am reading, learning or currently working on, mostly software-related. In this installment I will discuss monetization, the Hamburg AngularJS meetup and photographing in the mountains while hiking.
 
-<!-- more -->
-
 # Buying time for more blogging
 There's been one thought that keeps coming back. I really like writing this blog, but the problem is that I never seem to have enough time to really focus on it. Now I could try to make more time for it in my free time, but obviously that would be at the expense of my remaining private life. Or I could shift the blogging effort into my working life and get paid to do so. That's quite an attractive thought. How could one go about it? I buy a lot at <a target="_blank" href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a><img src="http://r.matthiasnehlsen.com/amazon-landing/img" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> because I find it really convenient to have my orders delivered the next day and because I have not once had problems sending stuff back that I did not like. Now I usually have an opinion on the stuff I buy, so why not share my thoughts on that? Using the **[Amazon Affiliate Program](https://affiliate-program.amazon.com)**, I can link to the product pages and whenever someone clicks on those links and then buys something within the next 24 hours, a small percentage of the price paid goes to me, the affiliate partner. The same goes for banner ads and such. Sounds like a decent way for the blog to start paying for itself, right?
 
@@ -32,15 +30,15 @@ I am looking forward to the **[next session on August 21st](http://www.meetup.co
 # The mountains / photography
 I am back already. The weather turned quite bad and I wasn't in the mood to get struck by lightning while on top of a mountain. Still, it was great and I am looking forward to the next time. I had my camera with me - a **Sony A7** full frame that by itself is a surprisingly compact camera. As a lens, I had the **Zeiss 24-70 OSS 4.0** lens - which I hoped would be a good combination for travel photography. Here are some examples:
 
-{% img left /images/photography/DSC02249-1200x800.jpg 'snow'%}
+![snow](../images/photography/DSC02249-1200x800.jpg)
 
 If you're interested, here is the image in the **[original resolution](/images/photography/DSC02249-full.jpg)**. It is not the original image, but rather the processed version I used when I ordered a larger-format print. If anyone is interested in the post processing in Photoshop, let me know. The same goes for the next image, with the original resolution **[here](/images/photography/DSC02231-full.jpg)**.
 
-{% img left /images/photography/DSC02231-1200x800.jpg 'valley'%}
+![valley](../images/photography/DSC02231-1200x800.jpg)
 
 Overall, I am happy with the image quality, but it is below the quality of images taken with fixed focal length lenses. Usually I don't use zoom lenses at all, so I would mostly use this lens when traveling. But is it really a good travel lens? No, I don't think so. It is way too bulky:
 
-{% img left /images/sony-a7-24-70.jpg 'a7 with 24-70mm'%}
+![a7 with 24-70mm](../images/sony-a7-24-70.jpg)
 
 I only got to use it ever so often as it had to go into the backpack because of its large size. That's kinda pointless when you are hiking with other people. Once you find your pace, you don't like to stop for that guy with the bulky camera, so you don't. Meaning, I fell behind and ended up taking way more photos with my smart phone because that was always handy. Couldn't I simply have taken these particular photos with the smart phone? Not a chance - besides the better image quality, the Zeiss lens also has a much more wide angle than the one in the smart phone.
 

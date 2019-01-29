@@ -8,8 +8,6 @@ categories:
 **Summary:** In this article I will present a new version of the BirdWatch application that uses **[ReactJS](http://facebook.github.io/react/)** on the client side instead of **[AngularJS](http://angularjs.org)**. Don't worry if you liked the previous AngularJS version - I do not intend to replace it. Rather, I want to create another version of the client side web application in order to get a better feeling for the pros and cons of different frameworks and libraries. So think of it as something like the **[TodoMVC](http://todomvc.com)** of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS anyone?
 For this new version I have also rewritten the barchart as a ReactJS component with integrated trend analysis and no dependency on **[D3.js](http://d3js.org)**. Again, there is nothing wrong with D3; I just like to try different approaches to the same problem.
 
-<!-- more -->
-
 In this article I will not go into a lot of detail about the server side of the BirdWatch application as there's an **[article on that](http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/)** already. What you need to know is that there is a server side application using **[Play Framework](http://www.playframework.com)** that connects to the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing at least one of these terms, up to a limit of 1% of all tweets at a given time[^1]. Then there is a client side JavaScript application that allows users to perform a live search inside a stream of tweets, with realtime updates of the UI when new search matches come in from Twitter. Here's how that looks like. Click the image to try out the application:
 
 <a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img src="/images/bw_reactjs.png" /></a>
@@ -44,22 +42,25 @@ Let's go through these areas one by one.
 In this area, AngularJS and its two-way data-binding shine. The content of the search input element is bound to a property on the **$scope**, just like the button is bound to a function that is also part of the **$scope** and that triggers a new search. ReactJS, on the other hand, does not offer two-way binding out of the box. There are helpers to achieve this, notably **[ReeactLink](http://facebook.github.io/react/docs/two-way-binding-helpers.html)**, but I have not tried it. It also seems that it is generally discouraged. In this case it was fairly trivial to achieve the functionality without ReactJS; instead I am assigning the functionality using onclick for triggering the search function, and jQuery to achieve the same when enter is pressed inside the input field. AngularJS offers more of a full framework solution for such problems, but I am okay with this solution here.
 
 {% codeblock Search Button lang:html https://github.com/matthiasn/BirdWatch/blob/603d4dfb85330e346afdf9241e36a62313eaa620/app/views/react_js.scala.html react_js.scala.html %}
+````
 <button class="btn btn-primary" type="button" onclick="BirdWatch.search()">
-{% endcodeblock %}
+````
 
 The button is plain HTML with an onclick handler. I have assigned the *search* function to serve as the handler function, which lives in a property of the global BirdWatch object. In addition to the click handler for the button, I also wanted to be able to trigger a search when pressing ENTER inside the search field. jQuery is perfect for that:
 
 {% codeblock Handling Enter in Search Field lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}
+```
   $('#searchForm').submit(function (e) {
     BirdWatch.search();
     e.preventDefault();
     return false;
   });
-{% endcodeblock %}
+````
 
 Finally here is the function that triggers the search:
 
-{% codeblock Function for triggering search lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}
+{% codeblock Function for triggering search lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}`
+```
   BirdWatch.search = function () {
     var searchField = $("#searchField");
     BirdWatch.wordcount.reset();
@@ -68,7 +69,7 @@ Finally here is the function that triggers the search:
     BirdWatch.tweets.search(searchField.val(), $("#prev-size").val());
     searchField.focus();
   };
-{% endcodeblock %}
+````
 
 The above is plain old HTML / JavaScript / jQuery. You may think this to be a rather old-fashioned way of doing it. But on the upside, no special framework knowledge is required, and anyone who has done any web development in the last decade can do this without a learning curve. Alternatively, we could make a ReactJS component out of the search bar and pass the the handler function to this component as part of the **props** [^3]. In this simple case I don't believe it is necessary to create a component, but this would be the way to go about it when more complex behavior is desired.
 
@@ -76,25 +77,28 @@ The above is plain old HTML / JavaScript / jQuery. You may think this to be a ra
 This is where it gets much more interesting. AngularJS renders the list of tweets from the data model using **ng-repeat** like this:
 
 {% codeblock ng-repeat in AngularJS version lang:html https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/app/views/index.scala.html index.scala.html %}
+````
 <!-- Tweet Cards inside frame -->
 <div class="col-lg-4" id="tweet-frame">
     <div class="tweetCard" data-ng-repeat="tweet in cf.tweetPage(currentPage, pageSize, sortModel)"
         data-tweet="tweet"></div>
 </div>
-{% endcodeblock %}
+````
 
 where *cf.tweetPage* is a function that delivers the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling *$scope.$apply* and also when anything else happens that has any effect on the data model, anywhere. This is what I meant when I said earlier that this may not be the most desirable thing when this function call is potentially expensive. 
 
 ReactJS works the other way round. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application actively feeds it new data. Let's look at that in more detail. In the HTML, there is only a single div without any special notation:
 
 {% codeblock Tweet List Div in ReactJS lang:html https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/app/views/react_js.scala.html react_js.scala.html %}
+```
     <!-- Tweet Cards inside frame -->
     <div class="col-lg-4" id="tweet-frame"></div>
-{% endcodeblock %}
+````
 
 Then in the component declaration, it looks as follows:
 
-{% codeblock Tweet List Div in ReactJS lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/jsx/tweetlist.js tweetlist.js %}
+{% codeblock Tweet List Div in ReactJS lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/jsx/tweetlist.js tweetlist.js %}`
+````js
 /** Component for conditional rendering of retweet count inside Tweet */
 var RetweetCount = React.createClass({
     render: function() {
@@ -145,7 +149,7 @@ var tweetCount = React.renderComponent(<TweetCount count={0}/>, document.getElem
 
 BirdWatch.setTweetCount = function (n) { tweetCount.setProps({count: n}); };
 BirdWatch.setTweetList = function (tweetList) { tweetListComp.setProps({tweets: tweetList}); };
-{% endcodeblock %}
+````
 
 Notice the **TweetList** component close to the bottom. This component itself has elements of the **Tweet** component type as child elements which it generates inside its only method *render* by mapping data in the array to individual elements. *Render*, by the way, is the only method that a ReactJS component is required to have. In this particular component, the child elements are generated by using the map function on the props.tweet, which accordingly needs to be an array as otherwise the JavaScript map function would not be available. In the mapper function, a **Tweet** component is created for every element of the array, and that element is passed to the Tweet component as **props**. 
 
@@ -157,6 +161,7 @@ The **Tweet** component then includes a **RetweetCount** component, to which it 
 Unlike in the AngularJS version, where I relied on additional projects, I have implemented this from scratch with ReactJS. Here's the entire component:
 
 {% codeblock Pagination component lang:javascript https://github.com/matthiasn/BirdWatch/blob/b9dc0b4cf19ec47c893aed27a690230dc882d1f8/react-js/jsx/pagination.js pagination.js %}
+````js
 /** Pagination component, allows selecting the current page in the Tweet list */
 var PaginationItem = React.createClass({
     setActive: function () {this.props.setPage(this.props.page)},
@@ -190,7 +195,7 @@ var Pagination = React.createClass({
 var pagination = React.renderComponent(<Pagination numPages={1} />, document.getElementById('pagination'));
 BirdWatch.setPagination = function (props) { pagination.setProps(props); };
 BirdWatch.setPaginationHandlers = function (handlers) { pagination.setProps(handlers); };
-{% endcodeblock %}
+````
 
 Once again, we have two components, one for each item and one that combines the individual items. In the Pagination component, we first determine the minimum of either the number of pages (passed in as **props**) or 25 in order to render a maximum of 25 pages. Then we do a map on this the resulting range (with the range being created by an **[underscore](http://underscorejs.org)** function), rendering one PaginationItem component for each of these pages. So far this is comparable to the components we have already seen above. What is new here is that the *handler functions* are also passed as **props** and assigned by the component. The nice thing about this is that this way we can also dynamically assign handler functions. We could just as well call functions on the global application object inside the handlers, but conceptually I find it cleaner to think about the component only ever receiving props, without needing to know anything about the application it is embedded in.
 
@@ -198,21 +203,25 @@ Once again, we have two components, one for each item and one that combines the 
 At first I did not really know how to achieve this feature using ReactJS. I have seen examples using **[Backbone](http://backbonejs.org)** and its **[router](http://backbonetutorials.com/what-is-a-router/)**, which would make sense for more complex applications. One such example is **[this article](https://medium.com/react-tutorials/c00be0cf1592)** and another one is **[this article](http://webdesignporto.com/react-js-with-backbone-router-and-local-storage/)**. For this application, introducing Backbone seemed like overkill though, so I was looking for a simpler approach. Turns out achieving this is super simple using **[jQuery](http://jquery.com)** and the plain old **[DOM API](http://www.w3.org/DOM/)**. For the search function I had already created a jQuery object:
 
 {% codeblock searchField jQuery object lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}
+````js
 var searchField = $("#searchField");
-{% endcodeblock %}
+````
 
 Then inside the search function, I simply set the **window.location.hash** with a **[URI encoded](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)** version of the search term:
 
 {% codeblock setting location hash when searching lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}
+````js
 window.location.hash = "/" + encodeURIComponent(searchField.val());
-{% endcodeblock %}
+````
 
 Then when loading the page, I read the location hash into the search field and call *search()*, which reads the content of the search field and triggers the search with whatever is in there:
 
 {% codeblock trigger search on page load lang:javascript https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js app.js %}
+
+````js
 searchField.val(decodeURIComponent(window.location.hash.substr(2)));
 BirdWatch.search();
-{% endcodeblock %}
+````
 
 ##Build system
 To round things off, I have configured a **[grunt-based](http://gruntjs.com)** build system that automatically **[transpiles](http://en.wikipedia.org/wiki/Source-to-source_compiler)** JSX into plain old JavaScript and then concatenates the files into a single JavaScript file. I have also included tasks for **[JsHint](http://www.jshint.com)** and **[Plato code analysis](https://github.com/es-analysis/plato)** to improve code quality. Ideally there should be additional tasks for a CSS preprocessor such as **[LESS](http://lesscss.org)** and minification of HTML, CSS and JavaScript files to achieve the best user experience possible, most notably fast load times. Maybe I'll get around to that at some point in time. I should also do the same for the AngularJS version. 
@@ -220,7 +229,7 @@ To round things off, I have configured a **[grunt-based](http://gruntjs.com)** b
 ##Building an SVG Bar Chart with ReactJS (without D3.js)
 **[D3.js](http://d3js.org)** is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally find ReactJS easier to reason about because unlike D3.js it does not have the notion of ***update***. Instead, we always pass it the entire data and it will put the changes into effect itself through an intelligent diffing mechanism where it compares current and previous versions of a (fast) virtual DOM and only puts the detected changes into effect in the (slow) actual DOM. Now I thought it would be nice if this concept could aso be applied to **[SVG (scalable vector graphics)](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)** in addition to HTML. Turns out the same principles apply, and accordingly I found it fairly simple to re-build the bar chart and have ReactJS instead of D3 create the SVG inside the **[DOM](http://en.wikipedia.org/wiki/Document_Object_Model)**. The resulting code is much shorter than the previous D3 version despite a lot of added functionality. The previous version was a simplistic bar chart, whereas the new version has a built-in trend analysis using **[regression-js](https://github.com/Tom-Alexander/regression-js)**, a neat little regression analysis library. In this new chart each bar is aware of its history and determines its trends using linear regression. Here's how that looks like:
 
-<img src="/images/react-barchart.png" />
+<img src="../images/react-barchart.png" />
 
 Each bar has two associated trend indicators, one to show recent movements in the ranking and the other to show an overall trend of the word occurrence. The trends are determined using a simple linear regression, where the slope of the resulting function directly translates into an upward or downward trend. I don't have the time to go into detail about the implementation of this chart today, but this topic should make for an interesting article in the future.  
 

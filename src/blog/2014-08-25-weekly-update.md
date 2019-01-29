@@ -7,8 +7,6 @@ categories:
 ---
 In this weekly update, I will be talking about **Clojure and ClojureScript**, an upcoming article on **AngularJS, Grunt, Karma and Protractor** and how I use **Upstart** to run my **Play** applications as services on **Ubuntu**.
 
-<!-- more -->
-
 ## AngularJS book available for pre-order on Amazon, Meetup
 I am very excited that the book that **[Amit Gharat](http://amitgharat.wordpress.com)** and I wrote about **[AngularJS UI Development](http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1783288477&linkCode=as2&tag=matthiasnehls-20&linkId=7WKFJKNQICCUSFES)** is now available for **[pre-order on Amazon](http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1783288477&linkCode=as2&tag=matthiasnehls-20&linkId=7WKFJKNQICCUSFES)**. Interesting experience to see it being listed already while still working on the final stages.
 
@@ -84,7 +82,7 @@ Et voilà - after a restart of the server, all services come up as expected. Muc
 ## Conclusion
 Last week was fairly **productive**, I got some really cool stuff done that had been on my mind for a while. I hope to continue this flow in the week that has just started. I'll let you know next week. **[Cliffhanger](http://en.wikipedia.org/wiki/Cliffhanger)**: I recently increased the **[Google PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fmatthiasnehlsen.com&tab=desktop)** score of this blog by a lot, from **58/100 to 83/100 for mobile** and from **77/100 to 90/100 for desktop**.
 
-{% img left /images/pagespeed.png 'pagespeed results'%}
+![pagespeed results](../images/pagespeed.png)
 
 It also feels like the pages are loading a lot faster. **Next week** I'll let you know what I did. Would you like to get notified when the next article is out? Just **sign up** for the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>mailing list</strong></a>.
 

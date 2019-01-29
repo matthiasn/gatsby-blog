@@ -7,15 +7,13 @@ categories:
 ---
 This weekly update is mostly about my new article series, about using animations to explain complex topics and about how I just extended the useful lifespan of my **2012 Retina MacBook**.
 
-<!-- more -->
-
 ## New article series: building systems in Clojure
 I am finally all set to start my new series of articles about the rewrite of my **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application in **[Clojure](http://clojure.org)**. I actually have two aims. First of all, I want short articles that are a quick and informative read, with easy-to-understand code. In addition, I want to illustrate what is going on by using **animations** (more about that in the next section). In this first installment, I will introduce you to my approach towards **[dependency injection](http://en.wikipedia.org/wiki/Dependency_injection)**. I personally believe that dependency injection is crucial for building larger applications as it allows proper decoupling between components. More about that in **[article one of the series](/blog/2014/09/24/Building-Systems-in-Clojure-1/)**.
 
 ## Animations reloaded
 Last year, I used an animation for the first time to illustrate the flow of information within an application. Here is how that looked like:
 
-{% img left /images/bw_expl_anim.gif 'birdwatch animated information flow' 'birdwatch animated information flow'%}
+![birdwatch animated information flow](../images/bw_expl_anim.gif)
 
 I still think that animated illustration is a great way of showing what is going in the application. Here's a link to the **[full article](/blog/2013/09/10/birdwatch-explained/)** if you want to see for yourself. However, there is one catch to that animation and that's the amount of time it took to produce it. The tool chain for this animation was as follows:
 

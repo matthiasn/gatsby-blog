@@ -7,8 +7,6 @@ categories:
 ---
 In this article I will present a simple reactive web application using **[Scala.js](http://www.scala-js.org)** and **[ReactJS](http://facebook.github.io/react/)** on the client side. It is based on **[sse-chat](https://github.com/matthiasn/sse-chat)**, an application I initially wrote for demonstrating the use of **[AngularJS with Play Framework](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. I then rewrote the client for an article about **[using ReactJS on the client side](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. In the latest version now, there is an additional client that connects to the same server and utilizes Scala.js to build the web client. I recently gave a talk about this at Ping Conference in Budapest, **[check it out](http://m.ustream.tv/recorded/42780242)** if you're interested. I discovered ReactJS through **[David Nolen's blog](http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/)** and his excellent **[OM library](https://github.com/swannodette/om)** which combines ReactJS with **[ClojureScript](https://github.com/clojure/clojurescript)**. His **[second article on Om](http://swannodette.github.io/2013/12/31/time-travel/)** also inspired me to try out an **undo** functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the **[tutorial](http://facebook.github.io/react/docs/tutorial.html)** and also reading my last **[blog post](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. 
 
-<!-- more -->
-
 # Why would someone want Scala on the client in the first place?
 Great question, I am glad you asked. A couple of things come to my mind:
 
@@ -22,19 +20,16 @@ Here is the new client in action. Note that **undo** will revert the application
 
 <iframe width="420" height="600" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
 
-<br />
-<br />
-
 # Architectural Overview
 The server side has stayed the same with the different clients. All clients (AngularJS, ReactJS, ReactJS and Scala.js) co-exist in the same project on **[GitHub](https://github.com/matthiasn/sse-chat)**. I would like to refer you to **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)** if you want to learn more about the server side. From the client's perspective, there is a **[Server Sent Event](https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events)** stream of messages for a particular chat room that the client subscribes to via an **[EventSource](http://www.w3.org/TR/2011/WD-eventsource-20110208/)** object. New messages are POSTed using an **[XmlHttpRequest](http://de.wikipedia.org/wiki/XMLHttpRequest)** object (facilitated by **[jQuery](http://jquery.com/)**). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch. 
 
-{% img left /images/sse-chat-scalajs.png %}
+![](../images/sse-chat-scalajs.png)
 
 Application state is represented by a Scala **[Case Class](http://www.scala-lang.org/old/node/107)**. A case class object stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a **Stack**. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a **[Stack](http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues)** is a **LIFO** (last-in-first-out) data structure that typically offers *push* for putting a new item on top of a stack, *pop* for removing the top element (with potentially consuming it) and *peek* or *top* for accessing the top element without removing it. In Scala's stack *peek* is called *head* as a more general abstract term to get the first element of a collection.
 
 Application state, in its current version, is passed to ReactJS for full render every single time something changes. This may sound like a lot of overhead if React completely re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast **[Virtual DOM](http://facebook.github.io/react/index.html)**. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occurred. This is really fast. If you run the chat app demo above for a while (or interact with it multiple times) so that the stack contains sufficient elements (hundreds), you should see changes in the browser at a full **60 frames per second**. 
 
-{% img left /images/undo-all-60fps.png 'images' 'images'%}
+![](../images/undo-all-60fps.png)
 
 React's rendering performance can still be optimized, ut it runs fine at 60 fps as it is. **Tip: You want 60fps** in your application all the time, otherwise the user may experience jerky and overall unpleasant scrolling if anything that happens takes longer than the time between each frame. For 60fps that means every action must be finished within 16ms, preferably faster.
 
@@ -44,6 +39,7 @@ So without further ado, let's have a look at how to implement the client side ch
 First we will look at the main application logic:
 
 {% codeblock Main Application lang:scala https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/SseChat.scala SseChat.scala %}
+````scala
 package com.matthiasnehlsen.sseChat
 
 /** current version of application state modeled as immutable case class */
@@ -77,7 +73,7 @@ object App {
 
   def main(): Unit = SseChatApp.listen(stack.peek.room, InterOp.addMsg _)
 }
-{% endcodeblock %}
+````
 
 
 First of all, the following is happening:
@@ -97,6 +93,7 @@ First of all, the following is happening:
 Next there is the **InterOp** file:
 
 {% codeblock InterOp lang:scala https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/InterOp.scala InterOp.scala %}
+````scala
 package com.matthiasnehlsen.sseChat
 
 import scala.scalajs.js
@@ -146,7 +143,7 @@ object InterOp {
 
   def setTimeout(fn: () => Unit, millis: Int): Unit = g.setTimeout(fn, millis)
 }
-{% endcodeblock %}
+````
 
 Let's go through this file step by step:
 
@@ -159,6 +156,7 @@ Let's go through this file step by step:
 Next we have the change-aware stack implementation: 
 
 {% codeblock Stack implementation lang:scala https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/ChangeAwareStack.scala ChangeAwareStack.scala %}
+````scala
 package com.matthiasnehlsen.sseChat
 
 import scala.collection.mutable.Stack
@@ -184,7 +182,7 @@ class ChangeAwareStack[T](onChange: () => Unit) extends Stack[T] {
 object ChangeAwareStack {
   def apply[T](onChange: () => Unit) = new ChangeAwareStack[T](onChange)
 }
-{% endcodeblock %}
+````
 
 This implementation is straightforward:
 
@@ -199,6 +197,7 @@ This implementation is straightforward:
 Functions from the **InterOp** object are then exported with specified names; this happens in order to protect their respective names. Otherwise, the **[Google Closure Compiler](https://developers.google.com/closure/compiler/)** would rename them. Without exporting the functions, they would also not be publicly accessible at all after the closure compiler optimization phase.
 
 {% codeblock Exported Functions lang:javascript https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/js/startup.js startup.js %}
+````js
 ScalaJS.modules.com_matthiasnehlsen_sseChat_App().main();
 
 var ScalaApp = {};
@@ -212,13 +211,14 @@ ScalaApp["submitMsg"] = ScalaApp.InterOp.addMsg__Lcom_matthiasnehlsen_sseChat_Ch
 ScalaApp["triggerReact"] = ScalaApp.InterOp.triggerReact__V;
 
 window['ScalaApp'] = ScalaApp;
-{% endcodeblock %}
+````
 
 Besides naming the exported functions by putting them in an object on the global scope, there is also a call to the *main* method of the Scala.js application. Personally, I am not terribly happy with putting anything at all on the global scope. Right now I have two global objects, one for the React side of things and one for the exported functions from the Scala.js application. This could quite easily be brought down to one by exporting the functions as properties of the same object used by the ReactJS application. I am just too lazy to do this right now. Please let me know if you have any ideas on how to reduce this to zero objects on the global scope. 
 
 Now let's have a look at an excerpt of the ReactJS application, written in JSX. Please note that for simplicity reasons I am running the JSX to JavaScript in your browser. You don't want to do that in a production system. 
 
 {% codeblock ReactJS application (excerpt) lang:javascript https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-app-scalajs.js react-app-scalajs.js %}
+````js
 /** undo component*/
 var UndoBox = React.createClass({
     handleUndo: function () { this.props.scalaApp.undo(); },
@@ -256,7 +256,7 @@ SseChatApp.setProps = function (props) { tlComp.setProps(props); };
 
 /** application ready, call initial trigger so that name and room get loaded without receiving message */
 ScalaApp.triggerReact();
-{% endcodeblock %}
+````
 
 + **UndoBox** is one of the application's components, handling the undo functionality described above. All it does is assigning handlers to the buttons, in which the functions passed in as props are called.
 
@@ -271,6 +271,7 @@ ScalaApp.triggerReact();
 Finally, we have some JavaScript code for interoperability and communication with the server side:
 
 {% codeblock ReactJS application (excerpt) lang:javascript https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-interop.js react-interop.js %}
+````js
 var SseChatApp = SseChatApp || {};
 
 SseChatApp.listen = function () {
@@ -303,7 +304,7 @@ SseChatApp.setUserProps      = function (user)      { SseChatApp.setProps({ user
 SseChatApp.setRoomProps      = function (room)      { SseChatApp.setProps({ room: room }); };
 SseChatApp.setMsgsProps      = function (msgs)      { SseChatApp.setProps({ msgs: msgs }); };
 SseChatApp.setStackSizeProps = function (stackSize) { SseChatApp.setProps({ stackSize: stackSize }); };
-{% endcodeblock %}
+````
 
 + *listen* is a function that is called for establishing a Server Sent Event connection to the server. Upon file loading, a self calling function closes over the ChatFeed variable so that it becomes accessible (and cancellable) on subsequent calls. This self-call then returns the actual function that allows establishing (and replacing) a connection to the stream for a particular room.
 

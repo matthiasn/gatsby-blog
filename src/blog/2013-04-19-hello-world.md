@@ -15,7 +15,7 @@ I am fascinated by the idea of reasoning over live data streams. There are quite
 
 Recently I started to work on a reactive web project for my portfolio, written in **[Scala](http://www.scala-lang.org)** using the **[Play Framework](http://www.playframework.com)**. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on **[GitHub]( https://github.com/matthiasn/BirdWatch)**, installed a demo on a **[web server](http://birdwatch.matthiasnehlsen.com)** and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense. 
 
-{% img left /images/screenshot.png 'image' 'images' %}
+![](../images/screenshot.png)
 
 Then it got mentioned on Twitter, retweeted 16 times and before I knew it, I had visitors from 272 cities in 48 countries on that web server. I know because out of curiosity I wrote a little logging routine that does GeoIP-lookup for every IP-address visiting that server on the fly, but that is the topic for a future post, potentially with a live visualization for the curious website owner.
 

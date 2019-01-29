@@ -21,8 +21,6 @@ nosharing: true
 
 If any of that is of interest to you at all (or if you want to see more animations like the one above), you may want to **read** the following article.
 
-<!-- more -->
-
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. The other week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
 In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for Twitter’s **[streaming data](https://dev.twitter.com/streaming/overview)**. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.
@@ -32,7 +30,7 @@ Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**
 
 Here is how that stream looks like when each chunk is simply printed to the console:
 
-{% img left /images/streaming-api.gif 'animated gif of streaming API output' 'animated gif of streaming API output'%}
+![animated gif of streaming API output](../images/streaming-api.gif)
 
 For reasons unbeknownst to me, tweets stopped respecting the chunk borders for the last half year. Instead, tweets occasionally span two or three chunks. This makes processing the tweets a little more complicated than we might wish for. One tweet per chunk is straightforward: 
 
@@ -45,16 +43,17 @@ That looks like functional programming, right? No state to be kept anywhere, jus
 I think we would all know what to do. There is a space where you park fragments of not-yet-complete bills / tweets. Then, with every new fragment, you inspect if the bill is complete and if so, put it back together and pass it on. Let’s try that in code. First, we will need to introduce **transducers** though.
 
 ## Transducers
-{% blockquote Rich Hickey http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming Cognitect Blog, August 6, 2014 %}
-Transducers are a powerful and composable way to build algorithmic transformations that you can reuse in many contexts, and they're coming to Clojure core and core.async.{% endblockquote %}
+
+>Transducers are a powerful and composable way to build algorithmic transformations that you can reuse in many contexts, and they're coming to Clojure core and core.async.
+[Cognitect Blog, August 6, 2014](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)
 
 In a way, a transducer is the **essence** of a computation over data, without being bound to any kind of collection or data structure. Above, before we had to concern ourselves with the incomplete fragments, there was one step of the computation that we could **model as a transducer**: the part where we wanted to parse JSON into a map data structure. 
 
 Imagine we wanted to transform a vector of JSON strings into a vector of such parsed maps. We could simply do this:
 
-{% codeblock lang:clojure %}
+````clojure
 (map json/read-json ["{\"foo\":1}" "{\"bar\":42}"])
-{% endcodeblock %}
+````
 
 However, the above is bound to the data structure, in this case a vector. That should not have to be the case, though. Rich Hickey provides a good example in his **[transducers talk](https://www.youtube.com/watch?v=6mTbuzafcII)**, likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and again for conveyor belts, where in reality that should not matter. 
 
@@ -62,27 +61,27 @@ We could, for example, not only run the mapping function over every item in a ve
 
 With Clojure 1.7, we can now create such a transducing function by simply leaving out the data structure:
 
-{% codeblock lang:clojure %}
+````clojure
 (def xform (map json/read-json))
-{% endcodeblock %}
+````
 
 Now, we can apply this transducing function to different kinds of data structures that are transducible processes. For example, we could transform all entries from a vector into another vector, like so:
 
-{% codeblock lang:clojure %}
+````clojure
 (into [] xform ["{\"foo\":1}" "{\"bar\":42}"])
-{% endcodeblock %}
+````
 
 Or into a sequence, like this:
 
-{% codeblock lang:clojure %}
+````clojure
 (sequence xform ["{\"foo\":1}" "{\"bar\":42}"])
-{% endcodeblock %}
+````
 
 It may not look terribly useful so far. But this can also be applied to a channel. Say, we want to create a channel that accepts JSON strings and transforms each message into a Clojure map. Simple:
 
-{% codeblock lang:clojure %}
+````clojure
 (chan 1 xform)
-{% endcodeblock %}
+````
 
 The above creates a channel with a buffer size of one that applies the transducer to every element.
 
@@ -90,7 +89,7 @@ But this does not help in our initial case here, where we know that some of the 
 
 Here’s how that looks like in code:
 
-{% codeblock stateful streaming-buffer transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
+````clojure
 (defn- streaming-buffer []
   (fn [step]
     (let [buff (atom "")]
@@ -101,7 +100,8 @@ Here’s how that looks like in code:
                to-process (butlast json-lines)]
            (reset! buff (last json-lines))
            (if to-process (reduce step r to-process) r)))))))
-{% endcodeblock %}
+````
+[stateful streaming-buffer transducer](https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj)
 
 Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don't have to use **atoms** here if we want to squeeze out the last bit of performance, but I find it easier not to introduce yet another concept unless absoletely necessary[^4]. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
 
@@ -109,29 +109,29 @@ In the first line of the let binding, we use the **[-> (thread-first)](http://cl
 
 Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been a subsequent tweet. But the last one may not be complete. Accordingly, we derive
 
-{% codeblock lang:clojure %}
+````clojure
 (butlast json-lines)
-{% endcodeblock %}
+````
  
 under the name **to-process**. Then, we reset the buffer to whatever is in that last string: 
 
-{% codeblock lang:clojure %}
+````clojure
 (reset! buff (last json-lines))
-{% endcodeblock %}
+````
 
 Finally, we have **reduce** call the **step** function for every item in **to-process**:
 
-{% codeblock lang:clojure %}
+````clojure
 (if to-process (reduce step r to-process) r)
-{% endcodeblock %}
+````
 
 That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That's all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this **streaming-buffer** transducer runs first and passes its result to the **JSON parser**.
 
 Let's create a vector of JSON fragments and try it out. We have already established that transducers can be used on different data structures, it therefore should work equally well on a vector. Here's the vector for the test:
 
-{% codeblock lang:clojure %}
+````clojure
 ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"]
-{% endcodeblock %}
+````
 
 Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost because we would only check its completeness once there is a following tweet[^6]. Once the collection to process is empty, the **arity-1** (single argument) function is called one last time, which really only returns the aggregate at that point:
 
@@ -146,9 +146,9 @@ Now we can check on the REPL if this will produce three complete JSON strings. I
 
 What somewhat confused me at first is what the step function actually was. Let's find out by printing it when the arity-1 function is called. We can modify the fourth line of **stream-buffer** like this:
 
-{% codeblock lang:clojure %}
-      ([r] (println step) (step r))
-{% endcodeblock %}
+````clojure
+([r] (println step) (step r))
+````
 
 Now when we run the same as above on the REPL, we can see what the step function actually is:
 
@@ -162,17 +162,18 @@ The step function is different when we use the transducer on a channel, but more
 
 There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common, which does not seem to appear in any status messages from Twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
 
-{% codeblock tweet? predicate function lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
+````clojure
 (defn- tweet? [data]
   "Checks if data is a tweet. If so, pass on, otherwise log error."
   (let [text (:text data)]
     (when-not text (log/error "error-msg" data))
     text))
-{% endcodeblock %}
+````
+[tweet? predicate function](https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj)
 
 Next, we also want to log the count of tweets received since the application started. Let's do this only for full thousands. We will need some kind of counter to keep track of the count. Let's create another **stateful transducer**:
 
-{% codeblock stateful count transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
+````clojure
 (defn- log-count [last-received]
   "Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items."
   (fn [step]
@@ -184,13 +185,14 @@ Next, we also want to log the count of tweets received since the application sta
          (when (zero? (mod @cnt 1000)) (log/info "processed" @cnt "since startup"))
          (reset! last-received (t/now))
          (step r x))))))
-{% endcodeblock %}
+````
+[stateful count transducer](https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj)
 
 This transducer is comparable to the one we saw earlier, except that the local atom now holds the count. Initially, the counter is incremented and then, when the counter is divisible by 1000, the count is logged. In addition, this function also resets the **last-received** timestamp. Of course, this could be factored out into a separate function, but I think this will do.
 
 Now, we can compose all these steps:
 
-{% codeblock composed transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
+````clojure
 (defn process-chunk [last-received]
   "Creates composite transducer for processing tweet chunks. Last-received atom passed in for updates."
   (comp
@@ -198,15 +200,16 @@ Now, we can compose all these steps:
    (map json/read-json)
    (filter tweet?)
    (log-count last-received)))
-{% endcodeblock %}
+````
+[composed transducer](https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj)
 
 The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt. 
 
 Let's try the composed transducer on a vector to see what's happening. For that, we create a vector with two JSON strings that contain the **:text** property and two that don't. 
 
-{% codeblock lang:clojure %}
+````
 ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
-{% endcodeblock %}
+````
 
 Then we should see that the invalid one is logged and the other two are returned (the final one at that point still in the buffer):
 

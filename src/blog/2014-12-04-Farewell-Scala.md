@@ -9,8 +9,6 @@ Dear Scala,
 
 Do you remember how we first met, back in 2012? I thought your functional approach was fresh, and different. For a while I believed we were made for each other. A first project was a success; on my own I was comfortable with the good parts of you. But as soon as I started working in teams writing Scala, your immense syntax started drowning me. At first, I took it as a compliment that you tried to please me by offering me to work the way I liked. But then I noticed that it wasn’t something you did for me in particular. Instead, you try to be everybody’s darling by offering every software development paradigm known to man.
 
-<!-- more -->
-
 I found that to be particularly gruesome when working with seasoned Java developers. Yeah, sure, they have been doing OOP for a long time, for whatever that’s worth. But that doesn’t mean that it’s a good idea to recreate Java in Scala with just a little bit less of boilerplate. In well over a year of working in Scala teams there hasn’t been a single day where I felt that there was a shared mindset about how to develop a system or even approach a problem.
 
 All this is not to say that one can’t develop powerful systems with you; there’s plenty of proof otherwise, but my heart is no longer in it and I am not even sure it ever was.
@@ -33,8 +31,6 @@ To sum up things, dear Scala, it is definitely over between the two of us. I don
 
 Cheers,
 Matthias
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
 
 [^1]: The whole LISP / S-expression / homoiconicity thing seems very compatible with the operating system of my brain, and I also feel that constraint is bliss. There aren’t nearly as many ways to write idiomatic Clojure as there are ways to write a Scala program.
 

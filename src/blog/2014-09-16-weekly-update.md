@@ -7,11 +7,8 @@ categories:
 ---
 In this weekly update, I will just give you a very brief update on what I've been doing. Most notably, I have refactored the **[Clojure](http://clojure.org)** version of my **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application to use Stuart Sierra's **[component library](https://github.com/stuartsierra/component)**. Other than that, I am calling in sick for the week. 
 
-<!-- more -->
+<a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img class="left" src="../images/bw-clj.gif" title="BirdWatch in action" alt="BirdWatch in action"></a>
 
-<a href="http://birdwatch2.matthiasnehlsen.com" target="_blank"><img class="left" src="/images/bw-clj.gif" title="BirdWatch in action" alt="BirdWatch in action"></a>
-
-<br />
 
 Above you can see what the latest **all-Clojure** version looks like. I have added two features: *a)* aggregation and sorting by **reach** and *b)* a counter for the total number of tweets indexed, which is updated every ten seconds. You can see a live version by clicking on the animated GIF.
 
@@ -25,7 +22,7 @@ As a result I have an application where ONLY the main namespace depends on the d
 I find this new architecture beautiful and I will surely write more about it soon. Until then, I could use **your help**. I am really just getting started with Clojure, and this is my first real application written in it. I would love to have more knowledgeable Clojurians review the code and point out to me possible improvements. Right now, I would especially appreciate your feedback regarding the **[server-side code](https://github.com/matthiasn/BirdWatch/tree/master/Clojure-Websockets/src/clj/birdwatch)**.
 
 ## Are Clojure developers happier?
-I recently read an article that **[Clojure developers are the happiest](http://www.itworld.com/big-data/433057/clojure-developers-are-happiest-developers)** developers. While I cannot honestly say that the article provides hard evidence, I can say for sure that I, for one, enjoy programming in **[Clojure](http://clojure.org)** more than I enjoyed programming in other languages in a while. I have also found the community rto be eally helpful. Yesterday, I had a problem I couldn't figure out myself. After scratching my head for way too long, it only took a few minutes after joining the **[Clojure room](http://clojure-log.n01se.net/date/2014-09-16.html)** on **IRC** for me to be happily coding again.
+I recently read an article that **[Clojure developers are the happiest](http://www.itworld.com/big-data/433057/clojure-developers-are-happiest-developers)** developers. While I cannot honestly say that the article provides hard evidence, I can say for sure that I, for one, enjoy programming in **[Clojure](http://clojure.org)** more than I enjoyed programming in other languages in a while. I have also found the community to be really helpful. Yesterday, I had a problem I couldn't figure out myself. After scratching my head for way too long, it only took a few minutes after joining the **[Clojure room](http://clojure-log.n01se.net/date/2014-09-16.html)** on **IRC** for me to be happily coding again.
 
 ## Clojure Resources
 I recently liberated my accumulated list of bookmarks on Clojure-related stuff and have since added every new link and useful link I came across. I am now working on making it a habit of writing a sentence or two about all the new resources I discover. In the past couple of days, I was really happy to see that people seem to find this compilation useful. Please go check it out if you haven't already: **[Clojure-Resources on GitHub](https://github.com/matthiasn/Clojure-Resources)**.
