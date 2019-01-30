@@ -3,11 +3,17 @@ import { Link, graphql } from "gatsby"
 import Layout from "../components/layout"
 import Container from '../components/container'
 import Helmet from 'react-helmet'
+import { DiscussionEmbed } from "disqus-react";
 
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
     console.log("pageContext", pageContext)
     const { prev, next } = pageContext
+    const disqusShortname = "matthiasnehlsen";
+    const disqusConfig = {
+        identifier: post.id,
+        title: post.frontmatter.title,
+    };
     return (
     <Container>
         <Helmet
@@ -39,6 +45,7 @@ export default ({ data, location, pageContext }) => {
                     </div>
                 </div>
             </div>
+            <DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
         </Layout>
     </Container>
     )

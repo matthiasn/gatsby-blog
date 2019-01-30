@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Introducing meins"
-date: "2019-01-29"
+date: "2019-01-31"
 comments: true
 categories: 
 ---

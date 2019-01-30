@@ -8,13 +8,10 @@ import Container from '../components/container'
 export default ({data}) => (
     <Container>
         <Layout>
-            <SEO title="Home" keywords={[`gatsby`, `application`, `react`]}/>
-            <h1>Hi everyone</h1>
-            <p>Welcome to my blog about software, data, and stuff. In the last couple of years, my interest has mostly
-                been in <strong>Clojure</strong> and <strong>ClojureScript</strong>, with a strong focus on an open
-                source application of mine called <strong><a href={"https://github.com/matthiasn/meins"}>meins</a>
-                </strong>.</p>
-
+            <SEO title="Home" keywords={[`clojure`, `clojurescript`, `github`, `software`]}/>
+            <p>Welcome to my blog. My interest is currently mostly in <strong>Clojure</strong> and <strong>ClojureScript</strong>, with a strong focus on an open
+                source application called <strong><a href={"https://github.com/matthiasn/meins"}>meins</a>
+                </strong>. You can find all my open source projects on my <strong><a href={"https://github.com/matthiasn"}>GitHub</a></strong> profile. Follow me to stay up to date with my latest work. I'm <strong>available</strong> for shorter or longer consulting gigs. Please do get in touch to find out more, either by email on my <strong><a href={"https://github.com/matthiasn"}>GitHub</a></strong>  profile or via <strong><a href={"https://www.linkedin.com/in/matthiasnehlsen/"}>LinkedIn</a></strong>.</p>
             <hr/>
 
             <div>
@@ -32,7 +29,6 @@ export default ({data}) => (
                 ))}
             </div>
 
-            <Link to="/page-2/">Go to page 2</Link>
         </Layout>
     </Container>
 
