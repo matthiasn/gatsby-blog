@@ -40,6 +40,7 @@ template {
 a {
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
+  font-weight: bold;
 }
 a:active,
 a:hover {
