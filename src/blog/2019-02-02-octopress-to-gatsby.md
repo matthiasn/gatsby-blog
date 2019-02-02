@@ -2,6 +2,7 @@
 layout: post
 title: "Octopress to Gatsby"
 date: "2019-02-02"
+draft: false
 comments: true
 categories: 
 keywords: "octropress, gatsby, blog, migration, static page generator"
@@ -17,18 +18,18 @@ Ideally, my desire was to find something written in [Clojure](https://clojure.or
 Then I discovered [Gatsby](https://github.com/gatsbyjs/gatsby), which is a static page generator using [React](https://reactjs.org/) and [GraphQL](https://graphql.org/). That sounded odd to me at first, since how could you respond to GraphQL queries when by definition of static pages there is no server-side service involved. That's not actually a contradiction though, as the GraphQL queries are used at build time, and in a neat and unobtrusive way at that. Here's how the template for a blog post looks like, which is a React component where the data for each post comes from the GraphQL query at the bottom:
 
 ````js
-import React from "react"
-import { Link, graphql } from "gatsby"
-import Layout from "../components/layout"
+import React from 'react'
+import { Link, graphql } from 'gatsby'
+import Layout from '../components/layout'
 import Container from '../components/container'
 import Helmet from 'react-helmet'
-import { DiscussionEmbed } from "disqus-react";
+import { DiscussionEmbed } from 'disqus-react';
 
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
-    console.log("pageContext", pageContext)
+    console.log('pageContext', pageContext)
     const { prev, next } = pageContext
-    const disqusShortname = "matthiasnehlsen";
+    const disqusShortname = 'matthiasnehlsen';
     const disqusConfig = {
         identifier: post.id,
         title: post.frontmatter.title,
@@ -38,8 +39,8 @@ export default ({ data, location, pageContext }) => {
         <Helmet
             title={post.frontmatter.title}
             meta={[
-                { name: 'description', content: 'Sample' },
-                { name: 'keywords', content: 'sample, something' },
+                { name: 'description', content: post.frontmatter.description },
+                { name: 'keywords', content: post.frontmatter.keywords },
             ]}
         />
         <Layout>
@@ -47,18 +48,18 @@ export default ({ data, location, pageContext }) => {
                 <h1>{post.frontmatter.title}</h1>
                 <time>{post.frontmatter.date}</time>
                 <div dangerouslySetInnerHTML={{ __html: post.html }} />
-                <div style={{display: "flex", justifyContent: "space-between"}}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
                     <div>
                         {prev && (
                             <Link to={prev.fields.slug}>
-                                <span>{ prev ? "← " + prev.frontmatter.title : null} </span>
+                                <span>{ prev ? '← ' + prev.frontmatter.title : null} </span>
                             </Link>
                         )}
                     </div>
                     <div>
                         {next && (
                             <Link to={next.fields.slug}>
-                                <span>{ next ? next.frontmatter.title + " →" : null} </span>
+                                <span>{ next ? next.frontmatter.title + ' →' : null} </span>
                             </Link>
                         )}
                     </div>
@@ -76,6 +77,8 @@ export const query = graphql`
       html
       frontmatter {
         title
+        keywords
+        description
         date(formatString: "DD MMMM, YYYY")
       }
     }
@@ -93,18 +96,18 @@ Sure, [Hiccup](https://github.com/weavejester/hiccup) looks far, far nicer than 
  * See: https://www.gatsbyjs.org/docs/node-apis/
  */
 
-const path = require(`path`)
-const { createFilePath } = require(`gatsby-source-filesystem`)
+const path = require('path')
+const { createFilePath } = require('gatsby-source-filesystem')
 
 exports.onCreateNode = ({ node, getNode, actions }) => {
     const { createNodeField } = actions
-    if (node.internal.type === `MarkdownRemark`) {
-        const slug = createFilePath({ node, getNode, basePath: `pages` })
-        const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,"$1/$2/$3/");
+    if (node.internal.type === 'MarkdownRemark') {
+        const slug = createFilePath({ node, getNode, basePath: 'pages' })
+        const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,'$1/$2/$3/');
 
         createNodeField({
             node,
-            name: `slug`,
+            name: 'slug',
             value: slug2,
         })
     }
@@ -114,8 +117,10 @@ exports.createPages = ({ graphql, actions }) => {
     const { createPage } = actions
     return graphql(`
     {
-      allMarkdownRemark (sort: { fields: [frontmatter___date], order: ASC})
-      {
+      allMarkdownRemark (
+        sort: { fields: [frontmatter___date], order: ASC}
+        filter: {frontmatter: { draft: { ne: true } }}
+      ) {
         edges {
           node {
             fields {
@@ -138,7 +143,7 @@ exports.createPages = ({ graphql, actions }) => {
 
             createPage({
                 path: node.fields.slug,
-                component: path.resolve(`./src/templates/blog-post.js`),
+                component: path.resolve('./src/templates/blog-post.js'),
                 context: {
                     // Data passed to context is available
                     // in page queries as GraphQL variables.

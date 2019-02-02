@@ -2,7 +2,8 @@ module.exports = {
     siteMetadata: {
         title: `Matthias Nehlsen`,
         subTitle: `Software, Data, and Stuff`,
-        description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
+        description: ``,
+        siteUrl: `https://matthiasnehlsen.com`,
         author: `@matthiasnehlsen`,
     },
     plugins: [
@@ -20,6 +21,61 @@ module.exports = {
             options: {
                 name: `src`,
                 path: `${__dirname}/src/`,
+            },
+        },
+        {
+            resolve: `gatsby-plugin-feed`,
+            options: {
+                query: `
+        {
+          site {
+            siteMetadata {
+              title
+              description
+              siteUrl
+              site_url: siteUrl
+            }
+          }
+        }
+      `,
+                feeds: [
+                    {
+                        serialize: ({query: {site, allMarkdownRemark}}) => {
+                            return allMarkdownRemark.edges.map(edge => {
+                                return Object.assign({}, edge.node.frontmatter, {
+                                    description: edge.node.excerpt,
+                                    date: edge.node.frontmatter.date,
+                                    url: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                                    guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                                    custom_elements: [{"content:encoded": edge.node.html}],
+                                })
+                            })
+                        },
+                        query: `
+            {
+              allMarkdownRemark(
+                limit: 1000,
+                sort: { order: DESC, fields: [frontmatter___date] },
+                filter: {frontmatter: { draft: { ne: true } }}
+              ) {
+                edges {
+                  node {
+                    excerpt
+                    html
+                    fields { slug }
+                    frontmatter {
+                      title
+                      date
+                    }
+                  }
+                }
+              }
+            }
+          `,
+                        output: "/atom.xml",
+                        title: "Matthias Nehlsen RSS Feed",
+                    },
+                ],
             },
         },
         `gatsby-transformer-sharp`,
