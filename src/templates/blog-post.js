@@ -32,6 +32,7 @@ export default ({ data, location, pageContext }) => {
         identifier: post.id,
         title: post.frontmatter.title,
     };
+    const url = 'https:/matthiasnehlsen.com' + pageContext.slug;
     return (
     <Container>
         <Helmet
@@ -65,28 +66,28 @@ export default ({ data, location, pageContext }) => {
             </div>
             <div style={{display: "flex",
                          marginTop: "20px"}}>
-                <TwitterShareButton url={window.location}>
+                <TwitterShareButton url={url}>
                     <TwitterIcon size={32} round={true} />
                 </TwitterShareButton>
-                <FacebookShareButton url={window.location}>
+                <FacebookShareButton url={url}>
                     <FacebookIcon size={32} round={true} />
                 </FacebookShareButton>
-                <LinkedinShareButton url={window.location}>
+                <LinkedinShareButton url={url}>
                     <LinkedinIcon size={32} round={true} />
                 </LinkedinShareButton>
-                <RedditShareButton url={window.location}>
+                <RedditShareButton url={url}>
                     <RedditIcon size={32} round={true} />
                 </RedditShareButton>
-                <WhatsappShareButton url={window.location}>
+                <WhatsappShareButton url={url}>
                     <WhatsappIcon size={32} round={true} />
                 </WhatsappShareButton>
-                <TelegramShareButton url={window.location}>
+                <TelegramShareButton url={url}>
                     <TelegramIcon size={32} round={true} />
                 </TelegramShareButton>
-                <EmailShareButton url={window.location}>
+                <EmailShareButton url={url}>
                     <EmailIcon size={32} round={true} />
                 </EmailShareButton>
-                <GooglePlusShareButton url={window.location}>
+                <GooglePlusShareButton url={url}>
                     <GooglePlusIcon size={32} round={true} />
                 </GooglePlusShareButton>
             </div>
