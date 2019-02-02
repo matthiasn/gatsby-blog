@@ -1,15 +1,15 @@
-import React from "react"
-import { Link, graphql } from "gatsby"
-import Layout from "../components/layout"
+import React from 'react'
+import { Link, graphql } from 'gatsby'
+import Layout from '../components/layout'
 import Container from '../components/container'
 import Helmet from 'react-helmet'
-import { DiscussionEmbed } from "disqus-react";
+import { DiscussionEmbed } from 'disqus-react';
 
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
-    console.log("pageContext", pageContext)
+    console.log('pageContext', pageContext)
     const { prev, next } = pageContext
-    const disqusShortname = "matthiasnehlsen";
+    const disqusShortname = 'matthiasnehlsen';
     const disqusConfig = {
         identifier: post.id,
         title: post.frontmatter.title,
@@ -28,18 +28,18 @@ export default ({ data, location, pageContext }) => {
                 <h1>{post.frontmatter.title}</h1>
                 <time>{post.frontmatter.date}</time>
                 <div dangerouslySetInnerHTML={{ __html: post.html }} />
-                <div style={{display: "flex", justifyContent: "space-between"}}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
                     <div>
                         {prev && (
                             <Link to={prev.fields.slug}>
-                                <span>{ prev ? "← " + prev.frontmatter.title : null} </span>
+                                <span>{ prev ? '← ' + prev.frontmatter.title : null} </span>
                             </Link>
                         )}
                     </div>
                     <div>
                         {next && (
                             <Link to={next.fields.slug}>
-                                <span>{ next ? next.frontmatter.title + " →" : null} </span>
+                                <span>{ next ? next.frontmatter.title + ' →' : null} </span>
                             </Link>
                         )}
                     </div>

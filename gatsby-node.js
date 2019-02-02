@@ -4,18 +4,18 @@
  * See: https://www.gatsbyjs.org/docs/node-apis/
  */
 
-const path = require(`path`)
-const { createFilePath } = require(`gatsby-source-filesystem`)
+const path = require('path')
+const { createFilePath } = require('gatsby-source-filesystem')
 
 exports.onCreateNode = ({ node, getNode, actions }) => {
     const { createNodeField } = actions
-    if (node.internal.type === `MarkdownRemark`) {
-        const slug = createFilePath({ node, getNode, basePath: `pages` })
-        const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,"$1/$2/$3/");
+    if (node.internal.type === 'MarkdownRemark') {
+        const slug = createFilePath({ node, getNode, basePath: 'pages' })
+        const slug2 = slug.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})-/gi,'$1/$2/$3/');
 
         createNodeField({
             node,
-            name: `slug`,
+            name: 'slug',
             value: slug2,
         })
     }
@@ -49,7 +49,7 @@ exports.createPages = ({ graphql, actions }) => {
 
             createPage({
                 path: node.fields.slug,
-                component: path.resolve(`./src/templates/blog-post.js`),
+                component: path.resolve('./src/templates/blog-post.js'),
                 context: {
                     // Data passed to context is available
                     // in page queries as GraphQL variables.
