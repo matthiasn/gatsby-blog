@@ -4,6 +4,7 @@ title: "Introducing meo - Thanks, Grandma!"
 date: "2018-03-15"
 comments: true
 categories: 
+keywords: "journal, journaling, blog, Clojure, ClojureScript, meo, meins"
 ---
 
 I would like to dedicate this blog post to my **grandma**. She just turned 94. Happy birthday, Grandma, I love you. This is a perfect time for introducing **[meo](https://github.com/matthiasn/meo)**, a [Clojure](https://clojure.org/)/[ClojureScript](https://clojurescript.org/) project that she inspired. About two years ago, she showed me a few photos from a trip to **Iceland**, including this one:

@@ -4,13 +4,15 @@ title: "Octopress to Gatsby"
 date: "2019-02-02"
 comments: true
 categories: 
+keywords: "octropress, gatsby, blog, migration, static page generator"
+description: "migrating static page generation from Octopress to Gatsby" 
 ---
 
 I started my blog back in **2013** using [Octopress](http://octopress.org/) as a static site generator, generating a bunch of files that [nginx](https://nginx.org/en/) would serve efficiently and reliably. I thought that would serve me well, but it never really did, as the environment would blow up more often than not, and I would find myself chasing problems with my local [Ruby](https://www.ruby-lang.org/en/) installation, something I was never qualified for, nor have the desire to become qualified for. 
 
 Then, trouble after trouble, I always wanted to look for a replacement, but never really found something that fit the bill, so I kept debugging and then feeling just a little turned off by the process of blogging in the process.
 
-Ideally, my desire was to find something in [Clojure](https://clojure.org), so at least I would have a better shot at debugging stuff. Last time I checked, probably one and a half or two years ago, there wasn't anything in Clojure that could replace Octopress, so I was excited when I found [cryogen](https://github.com/cryogen-project/cryogen) last week. But somehow, I couldn't get it to work properly when it comes to links in markdown, as some just would not be converted, for reasons I did not understand at all.
+Ideally, my desire was to find something written in [Clojure](https://clojure.org), so at least I would have a better shot at debugging stuff. Last time I checked, probably one and a half or two years ago, there wasn't anything in Clojure that could replace Octopress, so I was excited when I found [cryogen](https://github.com/cryogen-project/cryogen) last week. But somehow, I couldn't get it to work properly when it comes to links in markdown, as some just would not be converted, for reasons I did not understand at all. I needed a replacement for Octopress though, as I just could not get it to work any more, and I have multiple posts in the pipeline that need to go out.
 
 Then I discovered [Gatsby](https://github.com/gatsbyjs/gatsby), which is a static page generator using [React](https://reactjs.org/) and [GraphQL](https://graphql.org/). That sounded odd to me at first, since how could you respond to GraphQL queries when by definition of static pages there is no server-side service involved. That's not actually a contradiction though, as the GraphQL queries are used at build time, and in a neat and unobtrusive way at that. Here's how the template for a blog post looks like, which is a React component where the data for each post comes from the GraphQL query at the bottom:
 

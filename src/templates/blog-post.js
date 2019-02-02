@@ -19,8 +19,8 @@ export default ({ data, location, pageContext }) => {
         <Helmet
             title={post.frontmatter.title}
             meta={[
-                { name: 'description', content: 'Sample' },
-                { name: 'keywords', content: 'sample, something' },
+                { name: 'description', content: post.frontmatter.description },
+                { name: 'keywords', content: post.frontmatter.keywords },
             ]}
         />
         <Layout>
@@ -57,6 +57,8 @@ export const query = graphql`
       html
       frontmatter {
         title
+        keywords
+        description
         date(formatString: "DD MMMM, YYYY")
       }
     }
