@@ -6,13 +6,13 @@ comments: true
 categories: 
 ---
 
-Back in **2013**, I started my blog using [Octopress](http://octopress.org/) as the static site generator. I thought that would serve me well, but it never really did, as the installation would blow up more often than not, and I would find myself chasing problems with my local Ruby installation, something I was never qualified for, nor have the desire to become qualified for. 
+I started my blog back in **2013** using [Octopress](http://octopress.org/) as a static site generator, generating a bunch of files that [nginx](https://nginx.org/en/) would serve efficiently and reliably. I thought that would serve me well, but it never really did, as the environment would blow up more often than not, and I would find myself chasing problems with my local [Ruby](https://www.ruby-lang.org/en/) installation, something I was never qualified for, nor have the desire to become qualified for. 
 
 Then, trouble after trouble, I always wanted to look for a replacement, but never really found something that fit the bill, so I kept debugging and then feeling just a little turned off by the process of blogging in the process.
 
 Ideally, my desire was to find something in [Clojure](https://clojure.org), so at least I would have a better shot at debugging stuff. Last time I checked, probably one and a half or two years ago, there wasn't anything in Clojure that could replace Octopress, so I was excited when I found [cryogen](https://github.com/cryogen-project/cryogen) last week. But somehow, I couldn't get it to work properly when it comes to links in markdown, as some just would not be converted, for reasons I did not understand at all.
 
-Then I discovered [Gatsby](https://github.com/gatsbyjs/gatsby), which is a static page generator using [React](https://reactjs.org/) and [GraphQL](https://graphql.org/), which sounded odd to me at first, since how could you respond to GraphQL queries when by definition of static pages there is no server-side service involved. That's not actually a contradiction though, as the GraphQL queries are used at build time, and in a neat and unobtrusive way at that. Here's how the template for a blog post looks like, which is a React component where the data for each post comes from the GraphQL query at the bottom:
+Then I discovered [Gatsby](https://github.com/gatsbyjs/gatsby), which is a static page generator using [React](https://reactjs.org/) and [GraphQL](https://graphql.org/). That sounded odd to me at first, since how could you respond to GraphQL queries when by definition of static pages there is no server-side service involved. That's not actually a contradiction though, as the GraphQL queries are used at build time, and in a neat and unobtrusive way at that. Here's how the template for a blog post looks like, which is a React component where the data for each post comes from the GraphQL query at the bottom:
 
 ````js
 import React from "react"
@@ -82,7 +82,7 @@ export const query = graphql`
 ````
 [blog-post.js](https://github.com/matthiasn/gatsby-blog/blob/3049bf1d2f8d173e18f858045cab33a97421944b/src/templates/blog-post.js)
 
-This approach worked well for me when adapting what should go in the post and where. Then, there are the [Gatsby Node APIs], where the Markdown files are processed on startup and made available for example in the blog post template, or anywhere else. This is all that's happening there:
+Sure, [Hiccup](https://github.com/weavejester/hiccup) looks far, far nicer than [JSX](https://reactjs.org/docs/introducing-jsx.html), but other than that, I like self-service approach to data, where the query is specified with the component, and the result then being available at render time. Then, there are the [Gatsby Node APIs], where the Markdown files are processed on startup and made available for example in the blog post template, or anywhere else. This is all that's happening there:
 
 ````js
 /**
@@ -151,12 +151,14 @@ exports.createPages = ({ graphql, actions }) => {
 ````
 [gatsby-node.js](https://github.com/matthiasn/gatsby-blog/blob/3049bf1d2f8d173e18f858045cab33a97421944b/gatsby-node.js)
 
-This pipeline from markdown files into static pages rendered using React not only works in the build step before publication to a server, but also really nicely for updating the browser when I make changes to the markdown file, for a much better preview than a third party markdown viewer or a shaky IDE plugin, or some jumpy full browser page reload. 
+The file above is mostly from the excellent tutorial, my biggest change was to change the directory structure to match my previous Octopress blog, for `/blog/2019/02/02/octopress-to-gatsby/` instead of `/blog/2019-02-02-octopress-to-gatsby/`, and I was delighted that this seeming larger problem of path rewrites could be solved so elegantly.
 
-Okay, this is all I want to show you here just to give you an idea of how things work. You can follow the excellent tutorials if you want to learn more. So far, my experience with **Gatsby** has been smooth and almost without glitches. And at least I work with a technology stack I am somewhat familiar with, as opposed to having to debug a Ruby development environment, of which I want to know nothing.
+The pipeline from markdown files into static pages rendered using React not only works in the build step before publication to a server, but also really nicely for updating the browser when I make changes to the markdown file, for a much better preview than a third party markdown viewer or a shaky IDE plugin, or some jumpy full browser page reload. This preview does not move the browser page at all, other than what actually changed.
+
+Okay, this is all I want to show you here just to give you an idea of how things work. You can follow the excellent tutorials if you want to learn more. So far, my experience with **Gatsby** has been smooth and almost without glitches. And at least I work with a technology stack I am somewhat familiar with, as opposed to having to debug a Ruby development environment, of which I want to know as little as possible.
 
 There's just one problem I ran into, and that is code highlighting for Clojure code, which is off for namespaced keywords, like in the [StatsD](/blog/2016/08/04/systemd-and-clojure/) post. Please let me know if you've fixed it somewhere in the past, or have an idea how to fix it. Also, anything else you notice, as this post is also a test run for my new site generator. 
 
-Then next, I can get back to [meins](https://github.com/), my intelligent journal, formerly known as **meo** and written almost entirely in Clojure and ClojureScript. I have some interesting stuff coming up about establishing good and eliminating bad **habits**, and also how a journal can be instrumental when writing **post-mortems** about your own life, and learn from them.
+Then next, I can get back to [meins](https://github.com/), my intelligent journal, formerly known as **meo** and written almost entirely in [Clojure](https://clojure.org) and [ClojureScript](https://clojurescript.org/). I have some interesting stuff coming up about establishing good and eliminating bad **habits**, and also how a journal can be instrumental when you write **post-mortems** about your own life, and learn from them.
 
 Until then, Matthias

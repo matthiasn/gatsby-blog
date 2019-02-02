@@ -5,7 +5,7 @@ const typography = new Typography({
     baseLineHeight: 1.666,
     scaleRatio: 1.8,
     headerFontFamily: ['Oswald', 'Helvetica Neue', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
-    bodyFontFamily: ['PT Sans', 'serif'],
+    bodyFontFamily: ['Lato', 'PT Sans', 'sans-serif'],
     // See below for the full list of options.
 });
 

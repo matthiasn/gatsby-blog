@@ -606,7 +606,7 @@ code:after,
 tt:before,
 tt:after {
   letter-spacing: -0.2em;
-  content: ' ';
+  content: '';
 }
 pre code:before,
 pre code:after,
@@ -622,7 +622,8 @@ pre tt:after {
 time {
   padding-bottom: 12px;
   display: block;
-  font-family: 'Oswald';
-  font-weight: 300;
-  font-size: 0.9em;
+  font-family: 'Oswald', sans-serif;
+  font-weight: bold;
+  color: #999;
+  font-size: 0.8em;
 }

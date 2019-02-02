@@ -21,7 +21,7 @@ export default ({data}) => (
                             <h3 style={{marginBottom: "6px", color:"#333"}}>
                                 {node.frontmatter.title}
                             </h3>
-                            <span style={{fontFamily: "Oswald"}}>{node.frontmatter.date}</span>
+                            <time>{node.frontmatter.date}</time>
                         </Link>
                         <p>{node.excerpt}</p>
                         <hr/>
