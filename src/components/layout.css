@@ -536,6 +536,7 @@ p *:last-child {
 }
 li > p {
   margin-bottom: calc(1.45rem / 2);
+  display: inline;
 }
 code {
   font-size: 0.85rem;
