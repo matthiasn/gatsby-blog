@@ -85,7 +85,7 @@ export const query = graphql`
   }
 `
 ````
-[blog-post.js](https://github.com/matthiasn/gatsby-blog/blob/3049bf1d2f8d173e18f858045cab33a97421944b/src/templates/blog-post.js)
+[blog-post.js](https://github.com/matthiasn/gatsby-blog/blob/d00bcabb15da25f9a2431475045b1e43654b1d93/src/templates/blog-post.js)
 
 Sure, [Hiccup](https://github.com/weavejester/hiccup) looks far, far nicer than [JSX](https://reactjs.org/docs/introducing-jsx.html), but other than that, I like self-service approach to data, where the query is specified with the component, and the result then being available at render time. Then, there are the [Gatsby Node APIs], where the Markdown files are processed on startup and made available for example in the blog post template, or anywhere else. This is all that's happening there:
 
@@ -156,7 +156,7 @@ exports.createPages = ({ graphql, actions }) => {
     })
 };
 ````
-[gatsby-node.js](https://github.com/matthiasn/gatsby-blog/blob/3049bf1d2f8d173e18f858045cab33a97421944b/gatsby-node.js)
+[gatsby-node.js](https://github.com/matthiasn/gatsby-blog/blob/d00bcabb15da25f9a2431475045b1e43654b1d93/gatsby-node.js)
 
 The file above is mostly from the excellent tutorial, my biggest change was to change the directory structure to match my previous Octopress blog, for `/blog/2019/02/02/octopress-to-gatsby/` instead of `/blog/2019-02-02-octopress-to-gatsby/`, and I was delighted that this seeming larger problem of path rewrites could be solved so elegantly.
 
