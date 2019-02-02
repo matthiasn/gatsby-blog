@@ -612,3 +612,33 @@ time {
   color: #999;
   font-size: 0.8em;
 }
+
+.SocialMediaShareButton {
+  margin-right: 12px;
+}
+
+#mc_embed_signup {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+#mc_embed_signup_scroll {
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+#mc_embed_signup_scroll > input {
+  display: block;
+  border-radius: 6px;
+  margin-right: 6px;
+  border: #999 1px solid;
+  outline: none;
+  padding: 4px 8px;
+}
+#mc-embedded-subscribe {
+  background-color: lightgreen;
+}
+
+#disqus_thread {
+  padding: 0 20px;
+}

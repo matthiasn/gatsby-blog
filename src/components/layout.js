@@ -42,7 +42,7 @@ const Layout = ({ children }) => (
         >
           {children}
           <footer>
-              <div id="mc_embed_signup" style={{margin: "40px 20px"}}>
+              <div id="mc_embed_signup">
                   <form
                       action="https://matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5"
                       method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form"

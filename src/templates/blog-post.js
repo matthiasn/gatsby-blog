@@ -4,6 +4,24 @@ import Layout from '../components/layout'
 import Container from '../components/container'
 import Helmet from 'react-helmet'
 import { DiscussionEmbed } from 'disqus-react';
+import {
+    FacebookShareButton,
+    FacebookIcon,
+    GooglePlusShareButton,
+    GooglePlusIcon,
+    LinkedinShareButton,
+    LinkedinIcon,
+    TwitterShareButton,
+    TwitterIcon,
+    TelegramShareButton,
+    TelegramIcon,
+    WhatsappShareButton,
+    WhatsappIcon,
+    RedditShareButton,
+    RedditIcon,
+    EmailShareButton,
+    EmailIcon
+} from 'react-share';
 
 export default ({ data, location, pageContext }) => {
     const post = data.markdownRemark
@@ -45,8 +63,35 @@ export default ({ data, location, pageContext }) => {
                     </div>
                 </div>
             </div>
-            <DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
+            <div style={{display: "flex",
+                         marginTop: "20px"}}>
+                <TwitterShareButton url={window.location}>
+                    <TwitterIcon size={32} round={true} />
+                </TwitterShareButton>
+                <FacebookShareButton url={window.location}>
+                    <FacebookIcon size={32} round={true} />
+                </FacebookShareButton>
+                <LinkedinShareButton url={window.location}>
+                    <LinkedinIcon size={32} round={true} />
+                </LinkedinShareButton>
+                <RedditShareButton url={window.location}>
+                    <RedditIcon size={32} round={true} />
+                </RedditShareButton>
+                <WhatsappShareButton url={window.location}>
+                    <WhatsappIcon size={32} round={true} />
+                </WhatsappShareButton>
+                <TelegramShareButton url={window.location}>
+                    <TelegramIcon size={32} round={true} />
+                </TelegramShareButton>
+                <EmailShareButton url={window.location}>
+                    <EmailIcon size={32} round={true} />
+                </EmailShareButton>
+                <GooglePlusShareButton url={window.location}>
+                    <GooglePlusIcon size={32} round={true} />
+                </GooglePlusShareButton>
+            </div>
         </Layout>
+        <DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
     </Container>
     )
 }
