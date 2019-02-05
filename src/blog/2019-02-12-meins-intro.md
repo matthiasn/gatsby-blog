@@ -44,13 +44,15 @@ Next, there is a chronological list of all individual messages involved. To the 
 Overall, I find that such an interactive visualization helpful, not only when debugging message flows but also when trying to understand a system better in general. It's useful to not only have to rely on outdated documentation but also have the system chime in and document itself. 
 
 After looking into the packaged version, you may want to look inside a development instance. For that, you must have the following installed and running:
-* Leiningen
-* Node v10.x
-* Yarn
-* JDK 10+
+* [Leiningen](https://leiningen.org/)
+* [Node v10+](https://nodejs.org/)
+* [Yarn](https://yarnpkg.com/)
+* [JDK 10+](https://openjdk.java.net/)
 
-Then, run oncce:
+Then, run once:
+
     lein cljs-main
+    yarn install
 
 Then, run the following in parallel:
 
@@ -62,8 +64,12 @@ When all of these have started, run:
 
     npm start
 
-An existence of meins should have fired up that looks like the packaged version, except that the title is now electron instead of meins. This development instance uses figwheel, which means that changes in the UI code will be reflected immediately. Let's try this out. 
+An instance of **meins** should have fired up that looks like the packaged version, except that the title is now electron instead of meins. This development instance uses [Figwheel](https://github.com/bhauman/lein-figwheel), which means that changes in the UI code will be reflected immediately. Let's try this out. 
 
-Go to namespace x and look for the label text "" and change the label text to "". The change should be reflected in the UI almost immediately.
+Go to namespace `meins.electron.renderer.ui.grid` and look for the string `"add tab"` and change the label text to `"add first tab"`. The change should be reflected in the UI almost immediately after saving the file.
+
+The renderer subsystem has two major parts, the client-side state and and the ui component. The store component manages the state and has handler function that handle particular message types, and contain the business logic around the respective message flow.
+
+The ui component then subscribes to the application state and re-renders whenever something changes. Thanks to 
 
 The client or render component has its own state, which is worth inspecting during development. You can have a look at it pressing CMD-D for data explorer.

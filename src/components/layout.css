@@ -94,6 +94,7 @@ pre,
 samp {
   font-family: monospace, monospace;
   font-size: 1em;
+  margin: 1em 0 2em 0!important;
 }
 figure {
   margin: 1em 40px;
