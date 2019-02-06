@@ -16,20 +16,6 @@ module.exports = {
             },
         },
         {
-            resolve: `gatsby-transformer-remark`,
-            options: {
-                plugins: [
-                    {
-                        resolve: "gatsby-remark-external-links",
-                        options: {
-                            target: "_blank",
-                            rel: "nofollow"
-                        }
-                    }
-                ]
-            }
-        },
-        {
             resolve: `gatsby-source-filesystem`,
             options: {
                 name: `src`,
@@ -98,6 +84,26 @@ module.exports = {
             options: {
                 plugins: [
                     "gatsby-remark-copy-linked-files",
+                    {
+                        resolve: "gatsby-remark-external-links",
+                        options: {
+                            target: "_blank",
+                            rel: null
+                        }
+                    },
+                    {
+                        resolve: "gatsby-remark-embed-gist",
+                        options: {
+                            // Optional:
+
+                            // the github handler whose gists are to be accessed
+                            username: 'matthiasn',
+
+                            // a flag indicating whether the github default gist css should be included or not
+                            // default: true
+                            includeDefaultCss: true
+                        }
+                    },
                     {
                         resolve: `gatsby-remark-images`,
                         options: {
