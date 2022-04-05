@@ -1,15 +1,15 @@
 ---
 layout: post
 title: "Building an intelligent journal in Clojure, Part 2"
-date: "2019-03-06"
-draft: true
+date: "2019-03-12"
+draft: false
 comments: true
 categories: 
 keywords: "meins, systems-toolbox, inspect, clojure"
 description: "meins - a technical introduction, part 2: the codebase" 
 ---
 
-After looking inside the packaged version, you may want to fire up a development instance of **meins**. For that, you must have the following installed and running:
+After looking inside the packaged version, you may want to fire up a development instance of **meins**. For that, you need to have the following installed and running:
 
 * [Leiningen](https://leiningen.org/)
 * [Node v10+](https://nodejs.org/)
@@ -36,6 +36,8 @@ An instance of **meins** should fire up that looks like the packaged version, ex
 Go to namespace `meins.electron.renderer.ui.grid` and look for the string `"add tab"` and change the label text to `"add first tab"`. The UI should change almost immediately after saving the file.
 
 ## The Frontend
+
+![system](../images/2019-02-intro/2019-03-12_system_frontend.png)
 
 Now that you have the environment running, let's continue exploring the codebase. The renderer subsystem has two major parts, the client-side state and the ui component. The store component manages the state and has handler functions that handle particular message types, and contain the business logic around the respective message flow.
 
@@ -84,6 +86,8 @@ Here's a simple example for a handler function, the `refresh-cfg` function in th
 
 The backend runs inside a custom JVM, assembled by [jlink](https://docs.oracle.com/javase/10/tools/jlink.htm). It holds the application state with all journal entries inside a graph, which is an [ubergraph](https://github.com/Engelberg/ubergraph) data structure. This graph data structure is then traversed inside [Lacinia's Field Resolvers](https://lacinia.readthedocs.io/en/latest/resolve/index.html) when the UI sends [GraphQL](https://graphql.org/) queries to the backend. 
 
+![system](../images/2019-02-intro/2019-03-12_system_backend.png)
+
 You can dynamically explore the schema, the queries, and your data in a browser. This functionality is provided by [GraphiQL](https://github.com/graphql/graphiql). For this, you run **_Dev > Start GraphQL Endpoint_** and the point your browser to [localhost:7789](http://localhost:7789) for a packaged version of meins, and [localhost:8766](http://localhost:8766) when started from the command line. GraphiQL is pretty cool, it lets you explore the schema, and then build and run queries right there. 
 
 ![GraphiQL](../images/2019-02-intro/2019-02-08_23.44.50_graphiql.png)
@@ -107,7 +111,11 @@ With the tools presented so far, and the brief introduction to the systems-toolb
 
 ## Electron Main
 
+![system](../images/2019-02-intro/2019-03-12_system_main.png)
+
 The **Electron Main** process is responsible for starting up the application as a whole, and then both starting the **JVM backend** process and the browser window in which the **Renderer process** runs. Let's start with the wiring once again
+
+
 
 
 ## Conclusion
