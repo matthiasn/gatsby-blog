@@ -53,7 +53,7 @@ const Layout = ({ children }) => (
                               Email
                             </label>
                             <div class="rmBase__compContainer">
-                              <input type="text" name="email" id="email" placeholder="Email" value="" class="rmBase__comp--input comp__input">
+                              <input type="text" name="email" id="email" placeholder="Email" value="" class="rmBase__comp--input comp__input" />
                               <div class="rmBase__compError"></div>
                             </div>
                           </div>
@@ -72,18 +72,16 @@ const Layout = ({ children }) => (
                         <div class="rmBase__section">
                           <div class="rmBase__el rmBase__el--heading">
                             <div class="rmBase__comp--heading">
-                              Vielen Dank für Ihre Anmeldung!
-                  <!-- this linebreak is important, don't remove it! this will force trailing linebreaks to be displayed -->
-                              <br>
+                              Thank you for subscribing!
+                              <br />
                             </div>
                           </div>
                         </div>
                         <div class="rmBase__section">
                           <div class="rmBase__el rmBase__el--text">
                             <div class="rmBase__comp--text">
-                              Wir haben Ihnen auch schon die erste E-Mail geschickt und bitten Sie, Ihre E-Mail-Adresse über den Aktivierungslink zu bestätigen.
-                  <!-- this linebreak is important, don't remove it! this will force trailing linebreaks to be displayed -->
-                              <br>
+                              Please confirm your subscription in the confirmation email.
+                              <br />
                             </div>
                           </div>
                         </div>
