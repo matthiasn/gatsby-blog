@@ -43,7 +43,7 @@ Now that you have the environment running, let's continue exploring the codebase
 
 The ui component then subscribes to the application state and re-renders whenever something changes. Let's have a look at the client-side wiring:
 
-`gist:8f67e8cfa662403fe525a23f90eadab6?file=meins.electron.renderer.core.cljs&highlights=61,63-74,76-134`
+<script src="https://gist.github.com/matthiasn/8f67e8cfa662403fe525a23f90eadab6.js"></script>
 
 First, we have the **switchboard**, which will facilitate instantiation and wiring of components. Below, a set of components or rather their **blueprints** is defined. Each of the function calls returns a map that contains the component ID and optionally a state function that can set up the component state (otherwise it's just an empty map) and a map of handler functions, one for each message type that the component should handle. Message types are namespaced keywords. The systems-toolbox then uses [spec](https://clojure.org/guides/spec) to validate messages, which gives some of the benefits of a typesystem, but with less of the downside of making systems too rigid and resilient to change.
 
@@ -53,7 +53,7 @@ Then, there is the `:cmd/observe-state` message type, which allows a component t
 
 The `:renderer/store` component is a little more complex, let's just look at the blueprint map, which points us at the individual handler functions for each message type, plus the `state-fn` which gives the component its initial state:
 
-`gist:fe1b1492b85b6eb059fce1cd6d6d7597?file=meins.electron.renderer.client-store.cljc&highlights=12,31,35`
+<script src="https://gist.github.com/matthiasn/fe1b1492b85b6eb059fce1cd6d6d7597.js"></script>
 
 In the `state-fn`, you can get an idea what the initial component state will look like. However, as more and more handler functions return an updated state after processing different message types, it becomes more and more difficult to infer from the code alone how the state will have changed. In order to assist during development, there is a built-in way to have a look at the component state. It is called the **data explorer**[^2] and you can access it using either `CMD-D` on Mac or `Ctrl-D` on Linux and Windows, or via **_Dev > Toggle Data Explorer_** in the menu. This is how that looks like:
 
@@ -79,8 +79,7 @@ When a handler function returns, a map is expected. It can be empty, which means
 
 Here's a simple example for a handler function, the `refresh-cfg` function in the `meins.jvm.store.cfg` namespace:
 
-`gist:d7dff86619dc9759f71466354f3cd771?file=cfg.clj`
-
+<script src="https://gist.github.com/matthiasn/d7dff86619dc9759f71466354f3cd771.js"></script>
 
 ## The Backend
 
@@ -98,13 +97,13 @@ One of the nice features of GraphiQL is that you can interactively build a query
 
 This is the code that wires the backend system together:
 
-`gist:3c8a78f369e69ec88d0c0976c9784116?file=meins.jvm.core.clj&highlights=24,33,37,48,100`
+<script src="https://gist.github.com/matthiasn/3c8a78f369e69ec88d0c0976c9784116.js"></script>
 
 Once again, I find the drawing that **inspect** generated to be much more helpful than trying to map this in my brain. Like in the frontend, the `:backend/store` component holds application state and logic, only that here, a large part of the queries happen via GraphQL. 
 
 This is the `:backend/store` component:
 
-`gist:5fe1dcfbc1f8d10fbc4651a13390f173?file=store.clj&highlights=35-61`
+<script src="https://gist.github.com/matthiasn/5fe1dcfbc1f8d10fbc4651a13390f173.js"></script>
 
 With the tools presented so far, and the brief introduction to the systems-toolbox in this article, you should be much better equipped to understand what is going on here, as opposed to reading the code alone. I will go into detail about the GraphQL parts of the system in future post.
 
@@ -114,8 +113,6 @@ With the tools presented so far, and the brief introduction to the systems-toolb
 ![system](../images/2019-02-intro/2019-03-12_system_main.png)
 
 The **Electron Main** process is responsible for starting up the application as a whole, and then both starting the **JVM backend** process and the browser window in which the **Renderer process** runs. Let's start with the wiring once again
-
-
 
 
 ## Conclusion
