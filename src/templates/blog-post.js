@@ -7,14 +7,10 @@ import { DiscussionEmbed } from 'disqus-react';
 import {
     FacebookShareButton,
     FacebookIcon,
-    GooglePlusShareButton,
-    GooglePlusIcon,
     LinkedinShareButton,
     LinkedinIcon,
     TwitterShareButton,
     TwitterIcon,
-    TelegramShareButton,
-    TelegramIcon,
     WhatsappShareButton,
     WhatsappIcon,
     RedditShareButton,
@@ -81,15 +77,9 @@ export default ({ data, location, pageContext }) => {
                 <WhatsappShareButton url={url}>
                     <WhatsappIcon size={32} round={true} />
                 </WhatsappShareButton>
-                <TelegramShareButton url={url}>
-                    <TelegramIcon size={32} round={true} />
-                </TelegramShareButton>
                 <EmailShareButton url={url}>
                     <EmailIcon size={32} round={true} />
                 </EmailShareButton>
-                <GooglePlusShareButton url={url}>
-                    <GooglePlusIcon size={32} round={true} />
-                </GooglePlusShareButton>
             </div>
         </Layout>
         <DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
