@@ -130,5 +130,8 @@ help with:**
 2. [MSIX installer build](https://github.com/matthiasn/lotti/issues/942) issue.
 3. Integration/UI test strategy.
 4. [Integration tests for sync](https://github.com/matthiasn/lotti/issues/943).
+5. **Translations into additional languages**. Lotti's primary language is 
+   English, 
+   and it is fully translated into German on an ongoing basis. Please check the [localization-related issues on GitHub](https://github.com/matthiasn/lotti/labels/Localization) if you want to help translating Lotti into additional languages, or start by simply suggesting your language of choice.
 
-### Many thanks! 
+**Many thanks!**
