@@ -74,9 +74,6 @@ export default ({ data, location, pageContext }) => {
                 <RedditShareButton url={url}>
                     <RedditIcon size={32} round={true} />
                 </RedditShareButton>
-                <WhatsappShareButton url={url}>
-                    <WhatsappIcon size={32} round={true} />
-                </WhatsappShareButton>
                 <EmailShareButton url={url}>
                     <EmailIcon size={32} round={true} />
                 </EmailShareButton>
