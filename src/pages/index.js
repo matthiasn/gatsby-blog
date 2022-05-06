@@ -8,9 +8,9 @@ import Container from '../components/container'
 export default ({data}) => (
     <Container>
         <Layout>
-            <SEO title='Home' keywords={['clojure', 'clojurescript', 'github', 'software']}/>
-            <p>Welcome to my blog. I'm currently mostly interested in <strong>Clojure</strong> and <strong>ClojureScript</strong>, with a strong focus on an open
-                source application called <strong><a href={'https://github.com/matthiasn/meins'}>meins</a>
+            <SEO title='Home' keywords={['flutter', 'clojure', 'clojurescript', 'github', 'software']}/>
+            <p>Welcome to my blog. I'm currently mostly interested in <strong>Flutter</strong> and <strong>Clojure</strong>, with a strong focus on an open
+                source application called <strong><a href={'https://github.com/matthiasn/lotti'}>Lotti</a>
                 </strong>. You can find all my open source projects on my <strong><a href={'https://github.com/matthiasn'}>GitHub</a></strong> profile. Follow me to stay up to date with my latest work. I'm <strong>available</strong> for shorter or longer consulting gigs. Please do get in touch to find out more, either by email on my <strong><a href={'https://github.com/matthiasn'}>GitHub</a></strong>  profile or via <strong><a href={'https://www.linkedin.com/in/matthiasnehlsen/'}>LinkedIn</a></strong>.</p>
             <hr/>
 
