@@ -110,7 +110,9 @@ Now that it's working, I'm super happy with the result I achieved with Buildkite
 
 On the hardware side, I will probably move the Linux build onto a server with a decent [Xeon CPU](https://www.intel.com/content/www/us/en/products/details/processors/xeon/scalable.html) I have. Then for the iOS, macOS, Android and Windows builds (the latter in a VM), I will probably get a Mac Mini M1 so that I can actually close my laptop when I take a break, and have that little machine take over from there. Then I’ll measure the electricity costs. Let’s see how that fares in comparison to cloud options, both in terms of speed and cost. Not having to install any of the toolchain alone on each build will already constitute an unfair advantage over cloud runners - even if you add caches - due to the fact that saving and expanding them also takes valuable time. Then I’ll probably set up the same scenario with [self-hosted runners on GitHub Actions](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners) for good measure even though, from a UI perspective, Buildkite is my clear favorite at this point. Stay tuned.
 
-On the project side, I will show you how Lotti functions, what the vision of Lotti is and what are its applications. Spoiler alert: I’m not a fan of paying cloud providers tons of money for functions/storage that  my own hardware could do for much less and,even more importantly, I also want to keep any and all kinds of personal data about my lifestyle, health and so forth  out of the cloud.
+On the project side, I will show you how Lotti functions, what the vision of 
+Lotti is and what are its applications. Spoiler alert: I’m not a fan of 
+paying cloud providers tons of money for functions/storage that  my own hardware could do for much less  and, even more importantly, I also want to keep any and all kinds of personal data about my lifestyle, health and so forth  out of the cloud.
 
 Alright, this is all for today. Please feel free to share and discuss on Twitter: I look forward to your thoughts and observations. You can also sign up for the newsletter below to ensure that you don't miss any of the upcoming articles.
 
@@ -121,8 +123,8 @@ Matthias
 —
 
 ### P.S.
-### In case you have bandwidth, here are a few things I could do with some help 
-with:
+**In case you have bandwidth, here are a few things I could do with some 
+help with:**
 
 1. [Snap version of the Linux build](https://github.com/matthiasn/lotti/issues/941). I'm running into issues as the CMake version in the build environment is too old.
 2. [MSIX installer build](https://github.com/matthiasn/lotti/issues/942) issue.
