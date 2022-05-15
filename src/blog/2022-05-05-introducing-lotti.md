@@ -5,7 +5,7 @@ date: "2022-05-05"
 draft: false
 comments: true
 categories:
-keywords: "lotti, flutter, buildkite, travel journal"
+keywords: "lotti, flutter, buildkite, journal, travel journal"
 description: "Introducing Lotti or how I learned to love Flutter and Buildkite"
 ---
 

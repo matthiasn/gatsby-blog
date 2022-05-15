@@ -2,7 +2,7 @@
 layout: post
 title: "Building an intelligent journal in Clojure, Part 2"
 date: "2019-03-12"
-draft: false
+draft: true
 comments: false
 categories: 
 keywords: "meins, systems-toolbox, inspect, clojure"
