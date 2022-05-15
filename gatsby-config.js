@@ -167,6 +167,7 @@ module.exports = {
                 start_url: `/`,
                 background_color: `#c5d2db`,
                 theme_color: `#c5d2db`,
+                theme_color_in_head: false,
                 display: `minimal-ui`,
                 icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
             },
