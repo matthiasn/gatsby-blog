@@ -46,7 +46,7 @@ What's next:
 
 * [Lotti](https://github.com/matthiasn/lotti) is open-source software, and I'm looking for people to form a community around the app. It doesn't matter if you're a designer, an engineer, a behavioral psychologist, someone who believes that behavior can change, and want to devise and try an experiment. In all cases, this community is for you.
 * If you want to try this application and beta test it, please email me. Your onboarding experience will then be fed into in-app tutorials etc.
-* As soon as possible, thereafter, the app needs to become available for everyone on the respective app stores. Whereas there are plenty more features in the pipeline, capturing and monitoring data in the dashboards, despite the fact that it has not been perfected, is already good to go.
+* As soon as possible, thereafter, the app needs to become available for everyone on the respective app stores. There are plenty more features in the pipeline, however capturing and monitoring data in the dashboards — despite the fact that it has not been perfected —  is already good to go.
 
 That's all I have for today. Have a good weekend, and more to follow next week,
 
