@@ -46,14 +46,15 @@ What's next:
 
 * [Lotti](https://github.com/matthiasn/lotti) is open-source software, and I'm looking for people to form a community around the app. It doesn't matter if you're a designer, an engineer, a behavioral psychologist, someone who believes that behavior can change, and want to devise and try an experiment. In all cases, this community is for you.
 * If you want to try this application and beta test it, please email me. Your onboarding experience will then be fed into in-app tutorials etc.
-* As soon as possible, thereafter, the app needs to become available for everyone on the respective app stores. There are plenty more features in the pipeline, however capturing and monitoring data in the dashboards — despite the fact that it has not been perfected —  is already good to go.
+* As soon as possible, thereafter, the app needs to become available for everyone on the respective app stores. There are plenty more features in the pipeline, however, the capturing and monitoring of data in the dashboards — despite the fact that it has not been perfected —  is already good to go.
 
-That's all I have for today. Have a good weekend, and more to follow next week,
+That's all I have for today. Have a good week!
 
 Matthias
 
-[1]: Since switching over earlier this year, I've collected around 14K data points in Lotti, the new app. In meins, the former app, I still have a collection of 162K data points that I intend to migrate. But the old desktop app is still working fine, so there is no rush.
 
-[2]: This was already a concern before covid-19, and the pandemic only exacerbated the problems.
+[1]: Since switching over earlier this year, I've collected around 14K data points in Lotti, the new app. In [meins](https://github.com/matthiasn/lotti/tree/main/meins), the former app, I still have a collection of 162K data points that I intend to migrate. But the old desktop app is still working fine, so there is no rush.
 
-[3]: Lotti is cross-platform and runs on iOS, Android, macOS, Linux, and Windows. I'm using an iPhone and a MacBook personally, and I'm looking for help ensuring everything works on the other platforms. The builds generally work on all of them. Are you looking to contribute to an open-source project? This might be it. Please have a look at the issues and help out if you can.  
+[2]: This was already a concern before Covid-19, and the pandemic only exacerbated the problems.
+
+[3]: Lotti is cross-platform and runs on iOS, Android, macOS, Linux, and Windows. I'm using an iPhone and a MacBook personally, and I'm looking for help ensuring everything works on the other platforms. The builds generally work on all of them. Are you looking to contribute to an open-source project? This might be it. Please have a look at the [issues](https://github.com/matthiasn/lotti/issues) and help out if you can.  
