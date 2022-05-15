@@ -31,21 +31,21 @@ Long story short, by simply paying attention, moving more, and quite possibly ea
 
 **Fig 2: Screenshot Lotti, weight vs steps vs Push-ups (one of six daily body weight exercises, takes less than ten minutes per day)**
 
-Now I'm in no way saying that following the steps outlined above will give you similar results, or any results at all for that matter. Instead, Lotti can help anyone interested in facilitating change in their lives to build their own dashboard with a bunch of different data sources:
+Now I'm in no way saying that following the steps outlined above will give you similar results, or any results at all for that matter. What works for you is for you to find out. Once you have an idea for an experiment or intervention, Lotti can help you build a dashboard from a bunch of different data sources:
 
 * automatically collected data from Apple Health (or the Android equivalent) [3], such as steps or hours of sleep with just a smartphone;
 * exercise durations from Apple Health, either with a smartwatch or by using a running app, for example;
 * weight and blood pressure from Apple Health;
 * manually user-defined quantitative data, such as exercise repetitions, water or beer consumed, and anything relevant for the individual intervention.
 
-On the contrary, its contribution is helping you monitor any ongoing intervention you can come up with and then help tweak and refine your approach. Therefore, if you're interested in losing weight, the methods will probably not be wildly different in principle. After all, we all have to find a way of balancing energy in and energy out in a healthy way that makes you feel good in your own body. However, how exactly and at what pace we get there is individual and should be adaptive based on what works.
+On the contrary, its contribution is helping you monitor **any** ongoing intervention you can come up with and then help tweak and refine your approach. If you're interested in losing weight, the methods will probably not be wildly different from mine in principle. After all, we all have to find a way of balancing energy in and energy out in a healthy way that makes us feel good in our own bodies. However, how exactly and at what pace we get there is individual and should be adaptive based on what works.
 
-On the one hand, I'm mourning the phase where I can work on a piece of software like this one. It's a very luxurious position to be in, after all. But on the other hand, I feel that the time has come for more than one inquisitive mind (and associated  body) to benefit from these findings.
+On the one hand, I'm mourning the phase where I can work on a piece of software like this one all for myself and nobody else. It's a very luxurious position to be in, after all. But on the other hand, I feel that the time has come for more than one inquisitive mind (and associated  body) to benefit from these findings.
 
 What's next:
 
 * [Lotti](https://github.com/matthiasn/lotti) is open-source software, and I'm looking for people to form a community around the app. It doesn't matter if you're a designer, an engineer, a behavioral psychologist, someone who believes that behavior can change, and want to devise and try an experiment. In all cases, this community is for you.
-* If you want to try this application and beta test it, please email me . The experience onboarding you will then feed into in-app tutorials etc.
+* If you want to try this application and beta test it, please email me. The experience onboarding you will then feed into in-app tutorials etc.
 * As soon as possible, thereafter, the app needs to become available for everyone on the respective app stores. Whereas there are plenty more features in the pipeline, capturing and monitoring data in the dashboards, despite the fact that it has not been perfected, is already good to go.
 
 That's all I have for today. Have a good weekend, and more to follow next week,
